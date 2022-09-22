@@ -79,13 +79,19 @@ export class DispatchFromDepotPage extends formMixin() implements OnInit {
   }
 
   scan() {
+    this.showCamera(); // Remove
     this.qrScanner.prepare().then((status: QRScannerStatus) => {
       if (status.authorized) {
         this.showCamera();
       } else if (status.denied) {
-        alert('Not Authorised');
+        alert('Please grant access to Camera');
+        // camera permission was permanently denied
+        // you must use QRScanner.openSettings() method to guide the user to the settings page
+        // then they can grant the permission from there
+        this.qrScanner.openSettings();
       } else {
-        console.log('Nothing');
+        // permission was denied, but not permanently. You can ask for permission again at a later time.
+        this.qrScanner.openSettings();
       }
     });
   }

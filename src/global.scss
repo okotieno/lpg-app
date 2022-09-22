@@ -28,3 +28,10 @@
 ion-app.camera-view, ion-app.camera-view ion-content, ion-app.camera-view .nav-decor {
   --background: transparent none !important;
 }
+
+ion-app.camera-view ion-content:not(ion-app.camera-view ion-menu ion-content) {
+  background-image: url("assets/images/scan-backgroud.svg") !important;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-position: center;
+}
