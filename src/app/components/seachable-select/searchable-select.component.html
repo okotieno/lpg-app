@@ -1,0 +1,17 @@
+<!--{{ filters$ | async | json }}-->
+<ion-item>
+  <ion-label position="floating">{{ label }}</ion-label>
+  <ionic-selectable
+    [searchDebounce]="500"
+    [ngModel]="item"
+    (ngModelChange)="changeItem($event)"
+    [ngModelOptions]="{standalone: true}"
+    itemValueField="key"
+    itemTextField="label"
+    [items]="filters$ | async"
+    [canSearch]="true"
+    (onSearch)="searchItems($event)">
+  </ionic-selectable>
+  <ion-button *ngIf="showDelete" (click)="removeItem.emit()" color="danger" fill="outline" slot="end"><ion-icon name="trash" ></ion-icon></ion-button>
+</ion-item>
+

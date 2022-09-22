@@ -1,0 +1,40 @@
+<!--<ng-container *ngIf="order$ | async as order">-->
+<!--  <ion-header>-->
+<!--    <ion-toolbar color="primary">-->
+<!--      <ion-buttons slot="start">-->
+<!--        <ion-back-button [defaultHref]="'/tabs/view-received-order/' + order.orderId"></ion-back-button>-->
+<!--      </ion-buttons>-->
+<!--      <ion-title>Dispatch</ion-title>-->
+<!--    </ion-toolbar>-->
+<!--  </ion-header>-->
+<!--  <ion-content>-->
+<!--    <ion-item>-->
+<!--      <ion-label>-->
+<!--        <h2><strong>Order #{{order.orderId}} </strong></h2>-->
+<!--        <p>From : {{ order.fromDepotName}}</p>-->
+<!--        <p>To : {{ order.toDealerName}}</p>-->
+<!--      </ion-label>-->
+<!--    </ion-item>-->
+
+<!--    <form [formGroup]="form" (ngSubmit)="submitOrderAssign()">-->
+<!--      <ion-row>-->
+<!--        <ion-col>-->
+<!--          <ion-button *ngIf="(submitting$ | async) === false" [disabled]="form.invalid"-->
+<!--                      type="submit" color="success" expand="block">-->
+<!--            Dispatch-->
+<!--            <ion-icon name="log-in"></ion-icon>-->
+<!--          </ion-button>-->
+<!--          <ion-button *ngIf="(submitting$ | async)" color="success" expand="block">-->
+<!--             Dispatching-->
+<!--            <ion-spinner name="lines"></ion-spinner>-->
+<!--          </ion-button>-->
+<!--        </ion-col>-->
+<!--      </ion-row>-->
+<!--    </form>-->
+<!--  </ion-content>-->
+<!--</ng-container>-->
+
+<ion-content>
+  TESTING
+  <ion-button (click)="scan()">Scan</ion-button>
+</ion-content>
