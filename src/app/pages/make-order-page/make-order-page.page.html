@@ -1,0 +1,88 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Make Order</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <form [formGroup]="form" (ngSubmit)="submitOrder()">
+
+    <ion-item>
+      <ion-label>From Depot</ion-label>
+      <ionic-selectable
+        [searchDebounce]="500"
+        [ngModel]="depot"
+        (ngModelChange)="changeDepot($event)"
+        [ngModelOptions]="{standalone: true}"
+        itemValueField="depotName"
+        itemTextField="depotName"
+        [items]="depots"
+        [canSearch]="true"
+        (onSearch)="searchDealers($event)">
+      </ionic-selectable>
+    </ion-item>
+    <ion-item>
+      <ion-label>To Dealer</ion-label>
+      <ion-select formControlName="toDealerId">
+        <ion-select-option *ngFor="let dealer of dealerStations$ | async"
+                           [value]="dealer.dealerId">{{ dealer.dealerName }}</ion-select-option>
+      </ion-select>
+    </ion-item>
+    <ion-item-divider></ion-item-divider>
+
+    <h2>Quantities</h2>
+
+    <ng-container formArrayName="orderQuantities">
+      <ion-item-group
+        *ngFor="let item of orderQuantitiesControl.controls;
+        let i = index" [formGroupName]="i"
+      >
+        <ion-item-divider>
+          <ion-label>Item{{ i + 1}}</ion-label>
+          <ion-fab-button size="small" (click)="orderQuantitiesControl.removeAt(1)" color="danger" slot="end">
+            <ion-icon size="small" name="trash"></ion-icon>
+          </ion-fab-button>
+        </ion-item-divider>
+        <app-searchable-select
+          label="Brand"
+          formControlName="canisterBrandId"
+          idKey="canisterBrandId"
+          labelKey="canisterBrandName"
+          [service]="brandsService"
+          slot="start"
+        ></app-searchable-select>
+        <app-searchable-select
+          label="Canister Size"
+          formControlName="canisterSizeId"
+          idKey="canisterBrandId"
+          labelKey="canisterBrandName"
+          [service]="brandsService"
+          slot="start"
+        ></app-searchable-select>
+        <ion-item>
+          <ion-label position="floating">Quantity</ion-label>
+          <ion-input type="number" formControlName="quantity"></ion-input>
+        </ion-item>
+      </ion-item-group>
+    </ng-container>
+
+    <ion-row>
+      <ion-fab-button color="success" (click)="addOrder()">
+        <ion-icon name="add-circle"></ion-icon>
+      </ion-fab-button>
+    </ion-row>
+    <ion-row>
+      <ion-col>
+        <ion-button *ngIf="(submitting$ | async) === false" [disabled]="form.invalid"
+                    type="submit" color="success" expand="block">
+          Make Order
+          <ion-icon name="log-in"></ion-icon>
+        </ion-button>
+        <ion-button *ngIf="(submitting$ | async)" color="success" expand="block">
+          Making order
+          <ion-spinner name="lines"></ion-spinner>
+        </ion-button>
+      </ion-col>
+    </ion-row>
+  </form>
+</ion-content>

@@ -1,0 +1,50 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/dashboard"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Orders</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+  <ion-list>
+    <ion-list-header> {{ totalItems }} orders found</ion-list-header>
+    <ng-container *ngIf="orders$ | async as orders">
+      <ion-item-sliding *ngFor="let dealerStation of orders">
+        <ion-item>
+          <ion-label>
+            <h2><strong>Order #{{dealerStation.orderId}}</strong></h2>
+            <p>From : {{ dealerStation.fromDepotName}}</p>
+            <p>To : {{ dealerStation.toDealerName}}</p>
+            <ion-list>
+              <ion-item *ngFor="let quantityItem of dealerStation.orderQuantities">
+                <ion-avatar slot="start">
+                  <ion-icon name="calendar"></ion-icon>
+                </ion-avatar>
+                <ion-label>
+                  <h3>{{ quantityItem.canisterSizeName }} {{ quantityItem.canisterBrandName}}</h3>
+                  <p>Quantity {{ quantityItem.quantity }}</p>
+                </ion-label>
+              </ion-item>
+            </ion-list>
+          </ion-label>
+        </ion-item>
+        <ion-item-options side="end">
+          <ion-item-option [routerLink]="['/view-placed-order', dealerStation.orderId ]"><span style="width: 100px; text-align: center">View</span></ion-item-option>
+        </ion-item-options>
+      </ion-item-sliding>
+      <ion-item *ngIf="orders.length < 1">
+        <ion-label color="danger" >No orders found</ion-label>
+      </ion-item>
+    </ng-container>
+
+  </ion-list>
+  <ion-infinite-scroll (ionInfinite)="loadData($event)">
+    <ion-infinite-scroll-content></ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+</ion-content>
+

@@ -6,8 +6,12 @@ import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
 
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
-import { HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { QRScanner } from '@ionic-native/qr-scanner/ngx';
+import { JwtInterceptor } from './interceptors/jwt-interceptor/jwt.interceptor';
+import { APIInterceptor } from './interceptors/api-interceptor/api.interceptor';
+import { LoadingInterceptor } from './interceptors/loading-interceptor/loading.interceptor';
+import { environment } from '../environments/environment';
 
 @NgModule({
   declarations: [AppComponent],
@@ -18,7 +22,18 @@ import { QRScanner } from '@ionic-native/qr-scanner/ngx';
     HttpClientModule
   ],
   providers: [
+    {
+      provide: 'passportClient', // you can also use InjectionToken
+      useValue: environment.passportClient
+    },
+    {
+      provide: 'apiUrl', // you can also use InjectionToken
+      useValue: environment.apiUrl
+    },
     {provide: RouteReuseStrategy, useClass: IonicRouteStrategy},
+    {provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true},
+    {provide: HTTP_INTERCEPTORS, useClass: APIInterceptor, multi: true},
+    {provide: HTTP_INTERCEPTORS, useClass: LoadingInterceptor, multi: true},
     QRScanner
   ],
   bootstrap: [AppComponent],

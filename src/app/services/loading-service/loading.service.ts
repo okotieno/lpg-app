@@ -14,14 +14,14 @@ export class LoadingService {
 
   startLoader() {
     if (this.loaderStartRequestCount === 0) {
-      // this.show();
+      this.show();
     }
     this.loaderStartRequestCount += 1;
   }
 
   stopLoader() {
     if (this.loaderStartRequestCount === 1) {
-      // this.hide();
+      this.hide();
     }
     this.loaderStartRequestCount -= 1;
   }

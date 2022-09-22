@@ -1,0 +1,86 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/pages/received-orders"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Received Order</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ng-container *ngIf="order$ | async as order">
+    <ion-item>
+      <ion-label>
+        <h2><strong>Order #{{order.orderId}} </strong></h2>
+        <p>From : {{ order.fromDepotName}}</p>
+        <p>To : {{ order.toDealerName}}</p>
+        <ion-badge>{{ order.orderCompletionStatus * 100 }}% complete</ion-badge>
+      </ion-label>
+    </ion-item>
+    <ion-list>
+      <ion-list-header>Orders</ion-list-header>
+      <ion-item *ngFor="let quantityItem of order.orderQuantities">
+        <ion-avatar slot="start">
+          <ion-icon name="calendar"></ion-icon>
+        </ion-avatar>
+        <ion-label>
+          <h3>{{ quantityItem.canisterSizeName }} {{ quantityItem.canisterBrandName}}</h3>
+          <p>Quantity {{ quantityItem.quantity }}</p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+
+    <ion-item-sliding #slidingItemOrderStatus [disabled]="order.isAccepted">
+      <ion-item>
+        <ion-label>
+          <h2>Order status</h2>
+          <p *ngIf="!order.isAccepted">Order not accepted</p>
+          <ion-badge *ngIf="order.isAccepted" color="success">Accepted</ion-badge>
+        </ion-label>
+      </ion-item>
+      <ion-item-options side="start">
+        <ion-item-option color="danger" [routerLink]="['/decline-order']"><span
+          style="width: 100px; text-align: center">Decline</span></ion-item-option>
+      </ion-item-options>
+      <ion-item-options side="end">
+        <ion-item-option (click)="acceptOrder(slidingItemOrderStatus)"><span style="width: 100px; text-align: center">Accept</span>
+        </ion-item-option>
+      </ion-item-options>
+    </ion-item-sliding>
+
+    <ion-item-sliding [disabled]="order.isAssigned || !order.isAccepted">
+      <ion-item>
+        <ion-label>
+          <h2>Transporter</h2>
+          <p *ngIf="!order.isAssigned">Order not assigned</p>
+          <ion-badge *ngIf="order.isAssigned" color="success">Assigned</ion-badge>
+          <p *ngIf="order.isAssigned">To: {{ order.assignedToTransporterName }}</p>
+
+        </ion-label>
+      </ion-item>
+      <ion-item-options side="end">
+        <ion-item-option [routerLink]="['/assign-order', order.orderId]"><span
+          style="padding-left: 32px; padding-right: 32px">Assign Order</span></ion-item-option>
+      </ion-item-options>
+    </ion-item-sliding>
+
+    <ion-item-sliding [disabled]="!order.isAssigned || order.depotToTransporter">
+      <ion-item>
+        <ion-label>
+          <h2>Dispatch</h2>
+          <p *ngIf="!order.depotToTransporter">Order not dispatched</p>
+          <ion-badge *ngIf="order.depotToTransporter" color="success">Dispatched</ion-badge>
+
+        </ion-label>
+      </ion-item>
+      <ion-item-options side="end">
+        <ion-item-option [routerLink]="['/dispatch-from-depot', order.orderId]"><span
+          style="padding-left: 32px; padding-right: 32px">Dispatch</span></ion-item-option>
+      </ion-item-options>
+    </ion-item-sliding>
+  </ng-container>
+
+
+  <pre> {{ order$ | async | json }}</pre>
+
+</ion-content>

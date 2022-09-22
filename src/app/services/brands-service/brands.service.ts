@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { IResponse } from '../interfaces/i-response';
-import { IBrand } from '../interfaces/i-brand';
+import { IResponse } from '../../interfaces/i-response';
+import { IBrand } from '../../interfaces/i-brand';
 
 @Injectable({
   providedIn: 'root'
