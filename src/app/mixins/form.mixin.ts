@@ -20,7 +20,7 @@ export const formMixin = <T extends Constructor>(baseClass: T = class {
   class extends baseClass implements OnDestroy {
     formBuilder: FormBuilder;
     form: FormGroup;
-    formError$ = new BehaviorSubject<{errors: { [id: string]: string }}>(null);
+    formError$ = new BehaviorSubject<{errors: { [id: string]: string}; message: string}>(null);
     submitting$ = new BehaviorSubject<boolean>(false);
     destroyed$ = new Subject<void>();
     protected loadingService: LoadingService = new LoadingService(new LoadingController());

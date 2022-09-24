@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { map, switchMap, take, tap } from 'rxjs/operators';
 import { ActivatedRoute, Router } from '@angular/router';
 import { OrderService } from '../../services/order-service/order.service';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, combineLatest, Subscription } from 'rxjs';
 import { IOrder } from '../../interfaces/i-order';
-import { FormBuilder, Validators } from '@angular/forms';
+import { IQRInfo } from '../../interfaces/i-qr-info';
+import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { formMixin } from '../../mixins/form.mixin';
 import { QRScanner, QRScannerStatus } from '@ionic-native/qr-scanner/ngx';
 
@@ -13,78 +14,148 @@ import { QRScanner, QRScannerStatus } from '@ionic-native/qr-scanner/ngx';
   selector: 'app-dispatch-from-depot',
   templateUrl: './dispatch-from-depot.page.html',
   styleUrls: ['./dispatch-from-depot.page.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DispatchFromDepotPage extends formMixin() implements OnInit {
   orderId$ = this.route.paramMap.pipe(
     map((params) => params.get('orderId'))
   );
 
-  dispatchCylinders$ = new BehaviorSubject<{ id: number; size: number; ['RFID']: string; brand: string}[]>([]);
+  dispatchCylinders$ = new BehaviorSubject<IQRInfo[]>([]);
 
   form = this.fb.group({
     orderId: [0, [Validators.required]],
-    canisterIds: [[]]
+    from: 'depot',
+    canisters: this.fb.array([])
   });
 
-  order$: Observable<IOrder> = this.orderId$.pipe(
-    tap((orderId) => this.form.get('orderId').setValue(+orderId)),
-    switchMap(orderId => this.ordersService.acceptOrder({orderId: +orderId})),
-    take(1),
-    map(({data}) => data)
+  sub?: Subscription = null;
+
+  order$ = new BehaviorSubject<IOrder>({
+    acceptedAt: '',
+    assignedAt: '',
+    canisterSizeName: '',
+    dealerToTransporter: false,
+    depotToTransporter: false,
+    fromDepotId: 0,
+    isAccepted: false,
+    isAssigned: false,
+    orderId: 0,
+    orderQuantities: [],
+    toDealerId: 0,
+    transporterToDealer: false,
+    transporterToDepot: false
+  });
+
+  totalQuantities$ = this.order$.asObservable().pipe(
+    map(({orderQuantities}) => orderQuantities.reduce((prev, {quantity}) => prev + quantity, 0))
   );
   scanning$ = new BehaviorSubject(false);
+
+  v$ = combineLatest([this.order$, this.scanning$, this.dispatchCylinders$, this.totalQuantities$]).pipe(
+    map(([order, scanning, dispatchCylinders, totalQuantities]) => ({
+      order,
+      scanning,
+      dispatchCylinders,
+      totalQuantities
+    }))
+  );
 
   constructor(
     private route: ActivatedRoute,
     private ordersService: OrderService,
     private fb: FormBuilder,
     private router: Router,
-    private qrScanner: QRScanner
+    private qrScanner: QRScanner,
+    private cdr: ChangeDetectorRef
   ) {
     super();
   }
 
-  ngOnInit() {
-
+  get canistersControl() {
+    return this.form.get('canisters') as FormArray<FormGroup<{
+      tagged: FormControl<boolean>;
+      canisterId: FormControl<number>;
+      inGoodCondition: FormControl<boolean>;
+      canisterConditionDescription: FormControl<string>;
+    }>>;
   }
 
-  submitOrderAssign() {
+  ngOnInit() {
+    this.getOrder();
+
+    // *************** Testing Purposes only *************************//
+
+    // [3, 38].forEach((i) => {
+    //   this.canistersControl.push(this.fb.group({
+    //     canisterId: [i],
+    //     tagged: [true],
+    //     canisterConditionDescription: [''],
+    //     inGoodCondition: [true]
+    //   }));
+    // });
+
+    // ************************************************************ //
+  }
+
+  getOrder() {
+    this.orderId$.pipe(
+      tap((orderId) => this.form.get('orderId').setValue(+orderId)),
+      switchMap(orderId => this.ordersService.getItemWithId(+orderId)),
+      take(1),
+      map(({data}) => data),
+      tap((order) => this.order$.next(order))
+    ).subscribe();
+  }
+
+  submitOrderDispatch() {
     this.submit({
-      action: this.ordersService.assignOrder.bind(this.ordersService),
+      action: this.ordersService.dispatchCylinders.bind(this.ordersService),
       successCallback: () => {
-        this.router.navigate(['/pages', 'view-received-order', this.form.get('orderId').value]).then();
+        this.router.navigate(['view-received-order', this.form.get('orderId').value]).then();
       }
     });
   }
 
   hideCamera() {
     (window.document.querySelector('ion-app') as HTMLElement).classList.remove('camera-view');
-    this.scanning$.next(false);
+    this.qrScanner.hide();
   }
 
-  showCamera() {
-    this.scanning$.next(true);
-    (window.document.querySelector('ion-app') as HTMLElement).classList.add('camera-view');
-    console.log((window.document.querySelector('ion-app') as HTMLElement));
-    this.qrScanner.show();
-    this.qrScanner.scan().subscribe((info) => {
-      const data = JSON.parse(info);
-      this.dispatchCylinders$.next([...this.dispatchCylinders$.value, data]);
-      this.hideCamera();
-    }, (err) => {
-      console.log(err);
-    });
+  isAlreadyScanned(id: number) {
+    return !!this.dispatchCylinders$.value.find(({id: orderId}) => orderId === id);
   }
+
 
   scan() {
-    this.showCamera(); // Remove
     this.qrScanner.prepare().then((status: QRScannerStatus) => {
       if (status.authorized) {
-        let x = 0;
-        while (x < 10) {
-          this.showCamera();
-          x = x + 1;
-        }
+        this.scanning$.next(true);
+        this.qrScanner.show();
+        (window.document.querySelector('ion-app') as HTMLElement).classList.add('camera-view');
+        this.cdr.detectChanges();
+        this.sub = this.qrScanner.scan().subscribe((info) => {
+          const data = JSON.parse(info) as IQRInfo;
+
+          if (this.isAlreadyScanned(data.id)) {
+            alert('Already scanned!');
+            this.sub.unsubscribe();
+            this.scan();
+          } else {
+            this.scanning$.next(false);
+            this.dispatchCylinders$.next([...this.dispatchCylinders$.value, data]);
+            this.canistersControl.push(this.fb.group({
+              tagged: [true],
+              inGoodCondition: [true],
+              canisterConditionDescription: [null],
+              canisterId: [data.id]
+            }));
+            this.hideCamera();
+            this.cdr.detectChanges();
+            this.sub.unsubscribe();
+          }
+
+        });
       } else if (status.denied) {
         alert('Please grant access to Camera');
         // camera permission was permanently denied
@@ -98,4 +169,12 @@ export class DispatchFromDepotPage extends formMixin() implements OnInit {
     });
   }
 
+  closeScanner() {
+    if (this.sub) {
+      this.sub.unsubscribe();
+    }
+    this.hideCamera();
+    this.scanning$.next(false);
+    this.cdr.detectChanges();
+  }
 }

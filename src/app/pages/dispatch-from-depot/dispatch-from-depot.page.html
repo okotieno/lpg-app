@@ -1,27 +1,27 @@
-<ng-container *ngIf="order$ | async as order">
+<ng-container *ngIf="v$ | async as v">
   <ion-header>
     <ion-toolbar color="primary">
       <ion-buttons slot="start">
-        <ion-back-button *ngIf="(scanning$ | async) === false" [defaultHref]="'/pages/view-received-order/' + order.orderId"></ion-back-button>
+        <ion-back-button *ngIf="!v.scanning" [defaultHref]="'/view-received-order/' + v.order.orderId"></ion-back-button>
       </ion-buttons>
-      <ion-title *ngIf="(scanning$ | async)">Scanning...</ion-title>
-      <ion-title *ngIf="(scanning$ | async) === false">Dispatch</ion-title>
+      <ion-title *ngIf="v.scanning">Scanning...</ion-title>
+      <ion-title *ngIf="!v.scanning">Dispatch</ion-title>
     </ion-toolbar>
   </ion-header>
   <ion-content >
-    <ng-container *ngIf="(scanning$ | async) === false">
+    <ng-container *ngIf="!v.scanning">
       <ion-item>
         <ion-label>
-          <h2><strong>Order #{{order.orderId}} </strong></h2>
-          <p>From : {{ order.fromDepotName}}</p>
-          <p>To : {{ order.toDealerName}}</p>
+          <h2><strong>Order #{{v.order.orderId}} </strong></h2>
+          <p>From : {{ v.order.fromDepotName}}</p>
+          <p>To : {{ v.order.toDealerName}}</p>
         </ion-label>
       </ion-item>
 
       <ion-list>
         <ion-list-header>Dispatch Summary</ion-list-header>
-        <ion-item *ngFor="let dispatchCylinder of dispatchCylinders$ | async">
-          <ion-label>{{ dispatchCylinder | json }}</ion-label>
+        <ion-item *ngFor="let dispatchCylinder of v.dispatchCylinders">
+          <ion-label>{{ dispatchCylinder.size }}{{ dispatchCylinder.brand }}</ion-label>
         </ion-item>
       </ion-list>
 
@@ -29,12 +29,22 @@
         <ion-buttons>
           <ion-button color="primary"  (click)="scan()">Start Scanning</ion-button>
         </ion-buttons>
+
       </ion-item>
 
-      <form [formGroup]="form" (ngSubmit)="submitOrderAssign()">
+      <form [formGroup]="form" (ngSubmit)="submitOrderDispatch()">
+        <ion-item *ngIf="formError$ | async as formError">
+         <ion-label color="danger" class="ion-text-wrap">
+           <strong style="font-size: 10px" *ngIf="formError.message"> {{ formError.message }}</strong>
+           <div class="ion-color-danger" style="line-height: 12px" *ngIf="formError.errors['canisters']">
+             <ion-icon style="font-size: 10px" color="danger" name="information-circle-outline"></ion-icon>
+             <span style="font-size: 10px; line-height: 10px">{{ formError.errors['canisters'][0] }}</span>
+           </div>
+         </ion-label>
+        </ion-item>
         <ion-row>
           <ion-col>
-            <ion-button *ngIf="(submitting$ | async) === false" [disabled]="form.invalid"
+            <ion-button *ngIf="(submitting$ | async) === false" [disabled]="form.invalid || v.totalQuantities !== v.dispatchCylinders.length"
                         type="submit" color="success" expand="block">
               Dispatch
               <ion-icon name="log-in"></ion-icon>
@@ -45,10 +55,15 @@
             </ion-button>
           </ion-col>
         </ion-row>
+        <ion-button type="submit">SUBMIT</ion-button>
       </form>
+
     </ng-container>
     <ion-item>
-      {{ dispatchCylinders$.value.length }} cylinders scanned
+      {{ v.dispatchCylinders.length }} cylinders scanned
+      <ion-buttons slot="end" *ngIf="v.scanning">
+        <ion-button (click)="closeScanner()">Close</ion-button>
+      </ion-buttons>
     </ion-item>
   </ion-content>
 </ng-container>

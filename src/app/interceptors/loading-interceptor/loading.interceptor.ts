@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { finalize } from 'rxjs/operators';
+import { Observable, throwError } from 'rxjs';
+import { catchError, finalize } from 'rxjs/operators';
 import { LoadingService } from '../../services/loading-service/loading.service';
 
 @Injectable()
@@ -17,6 +17,10 @@ export class LoadingInterceptor implements HttpInterceptor {
     if (request.method === 'GET') {
       this.loadingService.startLoader();
       return next.handle(request).pipe(
+        catchError((err) => {
+          this.loadingService.stopLoader();
+          return throwError(err);
+        }),
         finalize(() => this.loadingService.stopLoader()),
       );
     } else {

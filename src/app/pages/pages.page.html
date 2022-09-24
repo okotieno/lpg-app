@@ -38,6 +38,11 @@
           Received Orders
         </ion-label>
       </ion-item>
+      <ion-item *ngIf="isTransporterUser$ | async" [routerLink]="['/transporter-orders']">
+        <ion-label>
+          Orders
+        </ion-label>
+      </ion-item>
     </ion-list>
   </div>
 </ion-content>

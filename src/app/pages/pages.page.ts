@@ -8,6 +8,7 @@ import { AuthenticationService } from '../services/authentication-service/authen
 })
 export class PagesPage {
   isDepotUser$ = this.authenticationService.isDepotUser$;
+  isTransporterUser$ = this.authenticationService.isTransporterUser$;
   isDealerUser$ = this.authenticationService.isDealerUser$;
 
   constructor(private authenticationService: AuthenticationService) {

@@ -54,4 +54,15 @@ export class OrderService {
       transporterId,
     });
   }
+
+  dispatchCylinders({ orderId,...formValue}: {
+    orderId: number;
+    canisters: { canisterId: number }[];
+  }) {
+    return this.http.post<IResponse<any>>(
+    // return this.http.post<IResponse<ICanisterBatch>>(
+      `orders/${orderId}/dispatch`,
+      formValue
+    );
+  }
 }
