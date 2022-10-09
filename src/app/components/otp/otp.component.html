@@ -1,3 +1,5 @@
-<div #inputItems>
-  <ion-input type="number" (paste)="pasteContent($event)" *ngFor="let item of values; let i = index;" [(ngModel)]="values[i]" (keydown)="moveCursor($event, i)"></ion-input>
+<div #inputItems style="width: 100%">
+  <input
+    size="1"
+    type="number" (paste)="pasteContent($event)" *ngFor="let item of values; let i = index;" [(ngModel)]="values[i]" (keydown)="moveCursor($event, i)">
 </div>
