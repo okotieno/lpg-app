@@ -30,17 +30,23 @@ export class AuthenticationService {
 
   auth$ = new BehaviorSubject<any>(null);
 
-  isDepotUser$ = this.auth$.pipe(
-    map(user => user.stationSpecificRoles.filter(({depotId}) => !!depotId).length > 0)
+  authDealerIds = this.auth$.pipe(
+    map(user => user?.stationSpecificRoles.filter(({dealerId}) => !!dealerId).map(({dealerId}) => dealerId))
   );
 
-  isTransporterUser$ = this.auth$.pipe(
-    map(user => user?.stationSpecificRoles.filter(({transporterId}) => !!transporterId).length > 0)
+  authDepotIds = this.auth$.pipe(
+    map(user => user?.stationSpecificRoles.filter(({depotId}) => !!depotId).map(({depotId}) => depotId))
   );
 
-  isDealerUser$ = this.auth$.pipe(
-    map(user => user?.stationSpecificRoles.filter(({dealerId}) => !!dealerId).length > 0)
+  authTransporterIds = this.auth$.pipe(
+    map(user => user?.stationSpecificRoles.filter(({transporterId}) => !!transporterId).map(({transporterId}) => transporterId))
   );
+
+  isDepotUser$ = this.authDepotIds.pipe(map(ids => ids.length > 0));
+
+  isTransporterUser$ = this.authTransporterIds.pipe(map(ids => ids.length > 0));
+
+  isDealerUser$ = this.authDealerIds.pipe(map(ids => ids.length > 0));
 
   constructor(
     private http: HttpClient, private router: Router,

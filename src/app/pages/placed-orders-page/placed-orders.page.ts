@@ -3,6 +3,8 @@ import { catchError, map, switchMap, take, tap } from 'rxjs/operators';
 import { AuthenticationService } from '../../services/authentication-service/authentication.service';
 import { OrderService } from '../../services/order-service/order.service';
 import { BehaviorSubject, throwError } from 'rxjs';
+import { IOrder } from '../../interfaces/i-order';
+import { PusherService } from '../../services/pusher-service/pusher.service';
 
 @Component({
   selector: 'app-placed-orders-page',
@@ -20,23 +22,43 @@ export class PlacedOrdersPage implements OnInit {
   };
   lastPage?: number;
   totalItems = 0;
-  dealerStations$ = this.authenticationService.auth$.pipe(
-    map((user) => user.stationSpecificRoles.filter(({dealerId}) => !!dealerId)
-      .map(({dealerId}) => dealerId)),
+
+  dealerStations$ = this.authenticationService.authDealerIds.pipe(
     switchMap((toDealerIds) => {
       this.queryParams = {...this.queryParams, ['toDealerIds[]']: toDealerIds};
       return this.getOrders();
     }),
   );
 
+  // dealerStations$ = this.authenticationService.auth$.pipe(
+  //   map((user) => user.stationSpecificRoles.filter(({dealerId}) => !!dealerId)
+  //     .map(({dealerId}) => dealerId)),
+  //   switchMap((toDealerIds) => {
+  //     this.queryParams = {...this.queryParams, ['toDealerIds[]']: toDealerIds};
+  //     return this.getOrders();
+  //   }),
+  // );
+
   constructor(
     private authenticationService: AuthenticationService,
-    private ordersService: OrderService
+    private ordersService: OrderService,
+    private pusherService: PusherService
   ) {
   }
 
   ngOnInit() {
     this.dealerStations$.subscribe();
+    this.authenticationService.authDealerIds.pipe(
+      take(1),
+      tap((ids) => {
+        ids.forEach(id => {
+          this.pusherService.pusher.subscribe(`order.dealer.${id}`).bind(`order.created`, (order: IOrder) => {
+            this.orders$.next([order, ...this.orders$.value,]);
+            this.totalItems += 1;
+          });
+        });
+      })
+    ).subscribe();
   }
 
   doRefresh($event: any) {

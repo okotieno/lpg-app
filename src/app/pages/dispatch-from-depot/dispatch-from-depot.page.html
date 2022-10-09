@@ -18,19 +18,19 @@
         </ion-label>
       </ion-item>
 
-      <ion-list>
+      <ion-item>
+        <ion-buttons>
+          <ion-button color="primary" (click)="scan()">Start Scanning</ion-button>
+        </ion-buttons>
+
+      </ion-item>
+
+      <ion-list *ngIf="v.dispatchCylinders.length > 0">
         <ion-list-header>Dispatch Summary</ion-list-header>
         <ion-item *ngFor="let dispatchCylinder of v.dispatchCylinders">
           <ion-label>{{ dispatchCylinder.size }}{{ dispatchCylinder.brand }}</ion-label>
         </ion-item>
       </ion-list>
-
-      <ion-item>
-        <ion-buttons>
-          <ion-button color="primary"  (click)="scan()">Start Scanning</ion-button>
-        </ion-buttons>
-
-      </ion-item>
 
       <form [formGroup]="form" (ngSubmit)="submitOrderDispatch()">
         <ion-item *ngIf="formError$ | async as formError">
@@ -43,7 +43,6 @@
          </ion-label>
         </ion-item>
         <ion-row>
-          <ion-button type="submit">SUBMIT</ion-button>
           <ion-col>
             <ion-button *ngIf="(submitting$ | async) === false" [disabled]="form.invalid || v.totalQuantities !== v.dispatchCylinders.length"
                         type="submit" color="success" expand="block">

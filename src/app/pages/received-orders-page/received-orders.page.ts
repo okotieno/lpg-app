@@ -3,6 +3,8 @@ import { map, switchMap, take, tap } from 'rxjs/operators';
 import { AuthenticationService } from '../../services/authentication-service/authentication.service';
 import { OrderService } from '../../services/order-service/order.service';
 import { BehaviorSubject } from 'rxjs';
+import { PusherService } from '../../services/pusher-service/pusher.service';
+import { IOrder } from '../../interfaces/i-order';
 
 @Component({
   selector: 'app-received-orders-page',
@@ -20,9 +22,7 @@ export class ReceivedOrdersPage implements OnInit {
   };
   lastPage?: number;
   totalItems = 0;
-  dealerStations$ = this.authenticationService.auth$.pipe(
-    map((user) => user.stationSpecificRoles.filter(({depotId}) => !!depotId)
-      .map(({depotId}) => depotId)),
+  depotStations$ = this.authenticationService.authDepotIds.pipe(
     switchMap((fromDepotIds) => {
       this.queryParams = {...this.queryParams, ['fromDepotIds[]']: fromDepotIds};
       return this.getOrders();
@@ -31,12 +31,24 @@ export class ReceivedOrdersPage implements OnInit {
 
   constructor(
     private authenticationService: AuthenticationService,
-    private ordersService: OrderService
+    private ordersService: OrderService,
+    private pusherService: PusherService
   ) {
   }
 
   ngOnInit() {
-    this.dealerStations$.subscribe();
+    this.depotStations$.subscribe();
+    this.authenticationService.authDepotIds.pipe(
+      take(1),
+      tap((ids) => {
+        ids.forEach(id => {
+          this.pusherService.pusher.subscribe(`order.depot.${id}`).bind(`order.created`, (order: IOrder) => {
+            this.orders$.next([order, ...this.orders$.value,]);
+            this.totalItems += 1;
+          });
+        });
+      })
+    ).subscribe();
   }
 
   doRefresh($event: any) {

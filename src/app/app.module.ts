@@ -31,6 +31,10 @@ import { environment } from '../environments/environment';
       provide: 'apiUrl', // you can also use InjectionToken
       useValue: environment.apiUrl
     },
+    {
+      provide: 'pusher', // you can also use InjectionToken
+      useValue: environment.pusher
+    },
     {provide: RouteReuseStrategy, useClass: IonicRouteStrategy},
     {provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true},
     {provide: HTTP_INTERCEPTORS, useClass: APIInterceptor, multi: true},

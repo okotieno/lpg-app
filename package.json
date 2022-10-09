@@ -31,6 +31,7 @@
     "ionic-selectable": "^4.9.0",
     "ionicons": "^6.0.3",
     "jetify": "^1.0.2",
+    "pusher-js": "^7.4.0",
     "rxjs": "~6.6.0",
     "tslib": "^2.2.0",
     "zone.js": "~0.11.4"
