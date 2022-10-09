@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@angular/core';
 import { BehaviorSubject, forkJoin, from, Observable, of, throwError } from 'rxjs';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { catchError, map, switchMap, tap } from 'rxjs/operators';
+import { catchError, map, switchMap, take, tap } from 'rxjs/operators';
 
 import { Router } from '@angular/router';
 import { PASSWORD_RESET_IDENTIFIER, TOKEN_KEY, USER_KEY } from '../../helpers/constants';
@@ -29,35 +29,18 @@ export class AuthenticationService {
     map(([user]) => user),
     tap(this.loadToken.bind(this))
   );
-  auth$ = this.refreshAuthSubject$.pipe(
-    switchMap(() => from(Preferences.get({key: USER_KEY}))),
-    switchMap((storedUser) => {
-      console.log('here');
-      if (storedUser.value) {
-        return of(JSON.parse(storedUser.value) as IAuthUser);
-      }
-      return this.authUserRequest$;
-    }),
-    catchError((err: HttpErrorResponse) => {
-      if (err.status === 401) {
-        return this.localLogout().pipe(
-          map((res) => null)
-        );
-      }
-      return throwError(() => err);
-    })
-  );
+  auth$ = new BehaviorSubject<any>(null);
 
   isDepotUser$ = this.auth$.pipe(
     map(user => user.stationSpecificRoles.filter(({depotId}) => !!depotId).length > 0)
   );
 
   isTransporterUser$ = this.auth$.pipe(
-    map(user => user.stationSpecificRoles.filter(({transporterId}) => !!transporterId).length > 0)
+    map(user => user?.stationSpecificRoles.filter(({transporterId}) => !!transporterId).length > 0)
   );
 
   isDealerUser$ = this.auth$.pipe(
-    map(user => user.stationSpecificRoles.filter(({dealerId}) => !!dealerId).length > 0)
+    map(user => user?.stationSpecificRoles.filter(({dealerId}) => !!dealerId).length > 0)
   );
 
   constructor(
@@ -65,6 +48,7 @@ export class AuthenticationService {
     @Inject('passportClient') private passportClient: { grantType: string; clientId: number; clientSecret: string }
   ) {
     this.loadToken().then();
+    this.getLoggedInUser();
   }
 
   requestPasswordReset = (formValue: any) =>
@@ -84,7 +68,17 @@ export class AuthenticationService {
         }))
       ])),
       map(([res]) => res),
-      tap(this.loadToken.bind(this))
+      switchMap((res) => forkJoin([
+        of(res),
+        from(this.loadToken())
+      ])),
+      map(([res]) => res),
+      // tap((res) => console.log({res})),
+      // switchMap(this.loadToken.bind(this)),
+      // // switchMap(() => this.authUserRequest$)
+      tap(() => {
+        this.getLoggedInUser();
+      })
     );
 
   passwordChange = (formValue: any) =>
@@ -110,10 +104,11 @@ export class AuthenticationService {
       scope: ''
     }).pipe(
       switchMap(token => from(Preferences.set({key: TOKEN_KEY, value: JSON.stringify(token)}))),
-      switchMap(this.loadToken.bind(this)),
+      switchMap(() => from(this.loadToken())),
       switchMap(() => this.authUserRequest$),
       tap(_ => {
         this.isAuthenticated.next(true);
+        this.refreshAuthSubject$.next(null);
       }),
       catchError(error => throwError(error))
     );
@@ -139,5 +134,32 @@ export class AuthenticationService {
         Preferences.remove({key: USER_KEY}),
       ])
     ).pipe(map(() => true));
+  }
+
+  getLoggedInUser() {
+    this.refreshAuthSubject$.pipe(
+      switchMap(() => from(Preferences.get({key: USER_KEY}))),
+      switchMap((storedUser) => {
+        if (storedUser.value) {
+          return of(JSON.parse(storedUser.value) as IAuthUser);
+        }
+        return this.http.get<{ data: IAuthUser }>('oauth/user').pipe(
+          map(({data}) => data),
+          switchMap(user => forkJoin([of(user), Preferences.set({key: USER_KEY, value: JSON.stringify(user)})])
+          ),
+          map(([user]) => user),
+          tap(this.loadToken.bind(this))
+        );
+      }),
+      tap((res) => this.auth$.next(res)),
+      catchError((err: HttpErrorResponse) => {
+        if (err.status === 401) {
+          return this.localLogout().pipe(
+            map((res) => null)
+          );
+        }
+        return throwError(() => err);
+      })
+    ).pipe(take(1)).subscribe()
   }
 }

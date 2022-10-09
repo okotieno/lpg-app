@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormControl, Validators } from '@angular/forms';
-import { AlertController } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { formMixin } from '../../mixins/form.mixin';
 import { CustomValidators } from '../../helpers/CustomValidators';
@@ -21,7 +20,6 @@ export class PasswordResetPage extends formMixin() {
   constructor(
     private fb: FormBuilder,
     private authService: AuthenticationService,
-    private alertController: AlertController,
     private router: Router,
   ) {
     super();

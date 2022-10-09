@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
+import { RouterModule, Routes } from '@angular/router';
 
 import { PagesPage } from './pages.page';
 
@@ -39,15 +39,30 @@ const routes: Routes = [
   },
   {
     path: 'dispatch-from-depot/:orderId',
-    loadChildren: () => import('./dispatch-from-depot/dispatch-from-depot.module').then( m => m.DispatchFromDepotModule)
+    loadChildren: () => import('./dispatch-from-depot/dispatch-from-depot.module').then(m => m.DispatchFromDepotModule)
   },
   {
     path: 'transporter-orders',
-    loadChildren: () => import('./transporter-orders/transporter-orders.module').then( m => m.TransporterOrdersModule)
+    loadChildren: () => import('./transporter-orders/transporter-orders.module').then(m => m.TransporterOrdersModule)
+  },
+  {
+    path: 'view-transporter-order/:orderId',
+    loadChildren: () => import('./view-transporter-order/view-transporter-order.module').then(m => m.ViewTransporterOrderModule)
+  },
+  {
+    path: 'dispatch-from-depot-confirmation/:orderId',
+    loadChildren: () =>
+      import('./dispatch-from-depot-confirmation/dispatch-from-depot-confirmation.module').then(m => m.DispatchFromDepotConfirmationModule)
+  },
+  {
+    path: 'transporter-to-dealer-confirmation/:orderId',
+    loadChildren: () =>
+      import('./transporter-to-dealer-confirmation/transporter-to-dealer-confirmation.module').then(
+        m => m.TransporterToDealerConfirmationModule)
   },
   {
     path: '',
-    redirectTo: '/tabs/dashboard',
+    redirectTo: '/dashboard',
     pathMatch: 'full'
   }
 ];

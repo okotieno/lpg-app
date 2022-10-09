@@ -1,5 +1,5 @@
 <ion-header [translucent]="true">
-  <ion-toolbar>
+  <ion-toolbar color="primary">
     <ion-buttons slot="start">
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
@@ -14,7 +14,7 @@
 
 <ion-content [fullscreen]="true">
   <ion-header collapse="condense">
-    <ion-toolbar>
+    <ion-toolbar color="primary">
       <ion-title size="large">Home</ion-title>
       <ion-buttons slot="end">
         <ion-button>
@@ -28,20 +28,33 @@
   <div id="container">
     <ion-list>
       <ion-list-header>Actions </ion-list-header>
-      <ion-item *ngIf="isDealerUser$ | async" [routerLink]="['/placed-orders']">
+      <ion-item *ngIf="isDealerUser$ | async" [routerLink]="['/make-order']">
+        <ion-icon name="bag-add-outline" slot="start"></ion-icon>
         <ion-label>
-          Placed Orders
+          <h2>Make Order</h2>
+          <p>Make a new order</p>
         </ion-label>
+        <ion-icon name="chevron-forward-outline" slot="end"></ion-icon>
+      </ion-item>
+      <ion-item *ngIf="isDealerUser$ | async" [routerLink]="['/placed-orders']">
+        <ion-icon name="timer-outline" slot="start"></ion-icon>
+        <ion-label>
+          <h2>Order History</h2>
+          <p>View my placed orders history</p>
+        </ion-label>
+        <ion-icon name="chevron-forward-outline" slot="end"></ion-icon>
       </ion-item>
       <ion-item *ngIf="isDepotUser$ | async" [routerLink]="['/received-orders']">
         <ion-label>
           Received Orders
         </ion-label>
+        <ion-icon name="chevron-forward-outline" slot="end"></ion-icon>
       </ion-item>
       <ion-item *ngIf="isTransporterUser$ | async" [routerLink]="['/transporter-orders']">
         <ion-label>
           Orders
         </ion-label>
+        <ion-icon name="chevron-forward-outline" slot="end"></ion-icon>
       </ion-item>
     </ion-list>
   </div>

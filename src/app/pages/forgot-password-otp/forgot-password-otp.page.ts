@@ -30,6 +30,7 @@ export class ForgotPasswordOtpPage extends formMixin() {
     this.submit({
       action: this.authService.confirmPasswordResetOtp,
       successCallback: (res) => {
+        console.log({isAuthenticated: this.authService.isAuthenticated.value});
         this.router.navigate(['/password-reset']).then();
       },
     });

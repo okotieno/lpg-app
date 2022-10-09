@@ -80,6 +80,7 @@ export class OtpComponent implements ControlValueAccessor, OnInit {
     $event.preventDefault();
 
     if (/^\d/.test($event.key)) {
+      console.log($event.key);
       this.inputItems.nativeElement.querySelectorAll('input')[i].value = $event.key;
       if (i < this.otpDigits - 1) {
         this.inputItems.nativeElement.querySelectorAll('input')[i + 1].focus();

@@ -11,12 +11,12 @@ import { QRScanner, QRScannerStatus } from '@ionic-native/qr-scanner/ngx';
 
 
 @Component({
-  selector: 'app-dispatch-from-depot',
-  templateUrl: './dispatch-from-depot.page.html',
-  styleUrls: ['./dispatch-from-depot.page.scss'],
+  selector: 'app-transporter-to-dealer-confirmation',
+  templateUrl: './transporter-to-dealer-confirmation.page.html',
+  styleUrls: ['./transporter-to-dealer-confirmation.page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class DispatchFromDepotPage extends formMixin() implements OnInit {
+export class TransporterToDealerConfirmationPage extends formMixin() implements OnInit {
   orderId$ = this.route.paramMap.pipe(
     map((params) => params.get('orderId'))
   );
@@ -25,8 +25,7 @@ export class DispatchFromDepotPage extends formMixin() implements OnInit {
 
   form = this.fb.group({
     orderId: [0, [Validators.required]],
-    from: 'depot',
-    canisters: this.fb.array([])
+    transporterToDealerOk: [true]
   });
 
   sub?: Subscription = null;
@@ -72,30 +71,8 @@ export class DispatchFromDepotPage extends formMixin() implements OnInit {
     super();
   }
 
-  get canistersControl() {
-    return this.form.get('canisters') as FormArray<FormGroup<{
-      tagged: FormControl<boolean>;
-      canisterId: FormControl<number>;
-      inGoodCondition: FormControl<boolean>;
-      canisterConditionDescription: FormControl<string>;
-    }>>;
-  }
-
   ngOnInit() {
     this.getOrder();
-
-    // *************** TODO-remove Testing Purposes only *************************//
-    //
-    // [4].forEach((i) => {
-    //   this.canistersControl.push(this.fb.group({
-    //     canisterId: [i],
-    //     tagged: [true],
-    //     canisterConditionDescription: [''],
-    //     inGoodCondition: [true]
-    //   }));
-    // });
-
-    // ************************************************************ //
   }
 
   getOrder() {
@@ -108,11 +85,11 @@ export class DispatchFromDepotPage extends formMixin() implements OnInit {
     ).subscribe();
   }
 
-  submitOrderDispatch() {
+  confirmCanistersFromDTransporter() {
     this.submit({
-      action: this.ordersService.dispatchCylinders.bind(this.ordersService),
+      action: this.ordersService.confirmCanisterDispatch.bind(this.ordersService),
       successCallback: () => {
-        this.router.navigate(['view-received-order', this.form.get('orderId').value]).then();
+        this.router.navigate(['view-placed-order', this.form.get('orderId').value]).then();
       }
     });
   }
@@ -144,12 +121,12 @@ export class DispatchFromDepotPage extends formMixin() implements OnInit {
           } else {
             this.scanning$.next(false);
             this.dispatchCylinders$.next([...this.dispatchCylinders$.value, data]);
-            this.canistersControl.push(this.fb.group({
-              tagged: [true],
-              inGoodCondition: [true],
-              canisterConditionDescription: [null],
-              canisterId: [data.id]
-            }));
+            // this.canistersControl.push(this.fb.group({
+            //   tagged: [true],
+            //   inGoodCondition: [true],
+            //   canisterConditionDescription: [null],
+            //   canisterId: [data.id]
+            // }));
             this.hideCamera();
             this.cdr.detectChanges();
             this.sub.unsubscribe();

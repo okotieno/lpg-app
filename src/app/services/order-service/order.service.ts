@@ -65,4 +65,11 @@ export class OrderService {
       formValue
     );
   }
+
+  confirmCanisterDispatch({ orderId, ...params}: { orderId: number; }) {
+    console.log({params});
+    return this.http.post<IResponse<IOrder>>(`${this.url}/${orderId}/status`, {
+      ...params,
+    });
+  }
 }

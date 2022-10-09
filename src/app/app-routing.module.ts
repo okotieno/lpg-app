@@ -17,7 +17,7 @@ const routes: Routes = [
   {
     path: 'forgot-password/otp',
     pathMatch: 'full',
-    loadChildren: () => import('./pages/forgot-password-otp/forgot-password-otp.module').then( m => m.ForgotPasswordPageModule),
+    loadChildren: () => import('./pages/forgot-password-otp/forgot-password-otp.module').then( m => m.ForgotPasswordOtpModule),
     canLoad: [GuestGuard]
   },
   {

@@ -1,28 +1,25 @@
 <ion-header>
   <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/dashboard"></ion-back-button>
+    </ion-buttons>
     <ion-title>Make Order</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
   <form [formGroup]="form" (ngSubmit)="submitOrder()">
-
+    <ion-item-divider></ion-item-divider>
+    <app-searchable-select
+      label="From Depot"
+      formControlName="fromDepotId"
+      idKey="depotId"
+      labelKey="depotName"
+      [service]="depotService"
+      slot="start"
+    ></app-searchable-select>
     <ion-item>
-      <ion-label>From Depot</ion-label>
-      <ionic-selectable
-        [searchDebounce]="500"
-        [ngModel]="depot"
-        (ngModelChange)="changeDepot($event)"
-        [ngModelOptions]="{standalone: true}"
-        itemValueField="depotName"
-        itemTextField="depotName"
-        [items]="depots"
-        [canSearch]="true"
-        (onSearch)="searchDealers($event)">
-      </ionic-selectable>
-    </ion-item>
-    <ion-item>
-      <ion-label>To Dealer</ion-label>
+      <ion-label position="floating">To Dealer</ion-label>
       <ion-select formControlName="toDealerId">
         <ion-select-option *ngFor="let dealer of dealerStations$ | async"
                            [value]="dealer.dealerId">{{ dealer.dealerName }}</ion-select-option>
@@ -30,9 +27,8 @@
     </ion-item>
     <ion-item-divider></ion-item-divider>
 
-    <h2>Quantities</h2>
-
-    <ng-container formArrayName="orderQuantities">
+    <ion-list formArrayName="orderQuantities">
+      <ion-list-header><h2>Quantities</h2></ion-list-header>
       <ion-item-group
         *ngFor="let item of orderQuantitiesControl.controls;
         let i = index" [formGroupName]="i"
@@ -49,22 +45,24 @@
           idKey="canisterBrandId"
           labelKey="canisterBrandName"
           [service]="brandsService"
-          slot="start"
+          [filterOptions]="{depotId: form.get('fromDepotId').value}"
         ></app-searchable-select>
         <app-searchable-select
           label="Canister Size"
           formControlName="canisterSizeId"
-          idKey="canisterBrandId"
-          labelKey="canisterBrandName"
-          [service]="brandsService"
+          idKey="canisterSizeId"
+          labelKey="canisterSizeName"
+          [service]="canisterSizeService"
+          [filterOptions]="{canisterBrandId: orderQuantitiesControl.controls[i].get('canisterBrandId').value}"
           slot="start"
         ></app-searchable-select>
         <ion-item>
           <ion-label position="floating">Quantity</ion-label>
           <ion-input type="number" formControlName="quantity"></ion-input>
         </ion-item>
+        <ion-item-divider></ion-item-divider>
       </ion-item-group>
-    </ng-container>
+    </ion-list>
 
     <ion-row>
       <ion-fab-button color="success" (click)="addOrder()">

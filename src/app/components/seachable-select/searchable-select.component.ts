@@ -30,6 +30,7 @@ export class SearchableSelectComponent
   @Input() placeholder = 'Please select';
   @Input() showDelete = false;
   @Output() removeItem = new EventEmitter();
+  @Input() filterOptions: Record<string, unknown> = {};
   isDisabled = false;
 
   filterSearch = '';
@@ -39,6 +40,7 @@ export class SearchableSelectComponent
   selectedValuesBeforeSearch: any = null;
   filters$ = new BehaviorSubject<{ key: string | number; label: string }[]>([]);
   destroyed$ = new Subject();
+  item: any;
   private queryParams: any = {page: 1, perPage: 15, searchTerm: ''};
 
   constructor(
@@ -64,8 +66,7 @@ export class SearchableSelectComponent
   onTouched: () => void = () => {
     //
   };
-  item: any;
-  items: any;
+
 
   registerOnChange(fn: any): void {
     this.onChanges = fn;

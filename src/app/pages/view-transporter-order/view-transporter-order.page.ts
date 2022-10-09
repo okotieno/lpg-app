@@ -1,18 +1,18 @@
-import { Component, OnInit } from '@angular/core';
-import { ActionSheetController, ViewWillEnter } from '@ionic/angular';
+import { Component } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { map, switchMap, take, tap } from 'rxjs/operators';
+import { OrderService } from '../../services/order-service/order.service';
 import { BehaviorSubject } from 'rxjs';
 import { IOrder } from '../../interfaces/i-order';
-import { ActivatedRoute } from '@angular/router';
-import { OrderService } from '../../services/order-service/order.service';
+import { ActionSheetController, ViewWillEnter } from '@ionic/angular';
 import { IonItemSliding } from '@ionic/angular/directives/proxies';
 
 @Component({
-  selector: 'app-view-placed-order',
-  templateUrl: './view-placed-order.page.html',
-  styleUrls: ['./view-placed-order.page.scss'],
+  selector: 'app-view-transporter-order',
+  templateUrl: './view-transporter-order.page.html',
+  styleUrls: ['./view-transporter-order.page.scss'],
 })
-export class ViewPlacedOrderPage implements ViewWillEnter {
+export class ViewTransporterOrderPage implements ViewWillEnter {
 
   orderId$ = this.route.paramMap.pipe(
     map((params) => params.get('orderId'))

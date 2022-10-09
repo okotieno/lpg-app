@@ -50,10 +50,6 @@ export const formMixin = <T extends Constructor>(baseClass: T = class {
           this.submitting$.next(false);
           // this.loadingService.stopLoader();
           this.formError$.next(res.error);
-          this.alertService.presentAlertError({
-            header: res.statusText,
-            message: res.error?.message ?? res.message
-          });
           if (errorCallback) {
             errorCallback(res);
           }

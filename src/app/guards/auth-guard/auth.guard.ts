@@ -16,7 +16,6 @@ export class AuthGuard implements CanLoad {
       distinctUntilChanged(),
       filter(val => val !== null), // Filter out initial Behaviour subject value
       map(isAuthenticated => {
-        console.log('Something');
         if (isAuthenticated) {
           return true;
         } else {

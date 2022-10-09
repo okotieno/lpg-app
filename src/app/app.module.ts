@@ -11,6 +11,7 @@ import { QRScanner } from '@ionic-native/qr-scanner/ngx';
 import { JwtInterceptor } from './interceptors/jwt-interceptor/jwt.interceptor';
 import { APIInterceptor } from './interceptors/api-interceptor/api.interceptor';
 import { LoadingInterceptor } from './interceptors/loading-interceptor/loading.interceptor';
+import { ErrorInterceptor } from './interceptors/error-interceptor/error.interceptor';
 import { environment } from '../environments/environment';
 
 @NgModule({
@@ -34,6 +35,7 @@ import { environment } from '../environments/environment';
     {provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true},
     {provide: HTTP_INTERCEPTORS, useClass: APIInterceptor, multi: true},
     {provide: HTTP_INTERCEPTORS, useClass: LoadingInterceptor, multi: true},
+    {provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true},
     QRScanner
   ],
   bootstrap: [AppComponent],

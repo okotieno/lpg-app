@@ -20,4 +20,4 @@ import { OtpModule } from '../../components/otp/otp.module';
     ],
   declarations: [ForgotPasswordOtpPage]
 })
-export class ForgotPasswordPageModule {}
+export class ForgotPasswordOtpModule {}

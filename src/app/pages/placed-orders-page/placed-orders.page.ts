@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { map, switchMap, take, tap } from 'rxjs/operators';
+import { catchError, map, switchMap, take, tap } from 'rxjs/operators';
 import { AuthenticationService } from '../../services/authentication-service/authentication.service';
 import { OrderService } from '../../services/order-service/order.service';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, throwError } from 'rxjs';
 
 @Component({
   selector: 'app-placed-orders-page',
@@ -40,11 +40,14 @@ export class PlacedOrdersPage implements OnInit {
   }
 
   doRefresh($event: any) {
-    // this.orders$.next([]);
     this.queryParams = {...this.queryParams, page: 0};
     this.getOrders({refresh: true}).pipe(
       take(1),
-      tap(() => $event.target.complete())
+      tap(() => $event.target.complete()),
+      catchError((err) => {
+        $event.target.complete();
+        return throwError(err);
+      })
     ).subscribe();
   }
 

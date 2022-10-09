@@ -10,6 +10,7 @@ import { formMixin } from '../../mixins/form.mixin';
 import { Router } from '@angular/router';
 import { OrderService } from '../../services/order-service/order.service';
 import { BrandsService } from '../../services/brands-service/brands.service';
+import { CanisterSizesService } from '../../services/canister-sizes-service/canister-sizes.service';
 
 interface IMakeOrderForm {
   fromDepotId: FormControl<number | null>;
@@ -47,19 +48,17 @@ export class MakeOrderPagePage extends formMixin() implements OnInit {
       }
     })
   );
-  depot: IDepot;
-  depots: IDepot[] = [];
-  depotsSubscription: Subscription;
 
   orderQuantities$ = new BehaviorSubject<any[]>([]);
 
   constructor(
-    private depotService: DepotService,
+    public depotService: DepotService,
     private fb: FormBuilder,
     private authenticationService: AuthenticationService,
     private router: Router,
     private orderService: OrderService,
-    public brandsService: BrandsService
+    public brandsService: BrandsService,
+    public canisterSizeService: CanisterSizesService,
   ) {
     super();
   }
@@ -70,52 +69,6 @@ export class MakeOrderPagePage extends formMixin() implements OnInit {
 
   ngOnInit() {
     this.addOrder();
-  }
-
-
-  filterDepots(ports: IDepot[], text: string) {
-    return ports.filter(port => port.depotName.toLowerCase().indexOf(text) !== -1 ||
-      port.depotCode.toLowerCase().indexOf(text) !== -1 ||
-      port.depotEPRALicenceNo.toLowerCase().indexOf(text) !== -1 ||
-      port.depotCode.toString().toLowerCase().indexOf(text) !== -1);
-  }
-
-  searchDealers(event: {
-    component: IonicSelectableComponent;
-    text: string;
-  }) {
-    const text = event.text.trim().toLowerCase();
-    event.component.startSearch();
-
-    // Close any running subscription.
-    if (this.depotsSubscription) {
-      this.depotsSubscription.unsubscribe();
-    }
-
-    if (!text) {
-      // Close any running subscription.
-      if (this.depotsSubscription) {
-        this.depotsSubscription.unsubscribe();
-      }
-
-      event.component.items = [];
-      event.component.endSearch();
-      return;
-    }
-
-    this.depotsSubscription = this.depotService.getItems({
-      perPage: 20,
-      page: 1,
-      searchTerm: text
-    }).subscribe(ports => {
-      // Subscription will be closed when unsubscribed manually.
-      if (this.depotsSubscription.closed) {
-        return;
-      }
-
-      event.component.items = this.filterDepots(ports.data, text);
-      event.component.endSearch();
-    });
   }
 
   changeDepot(event: IDepot) {
