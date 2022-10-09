@@ -33,6 +33,7 @@
 
             <p>From : {{ dealerStation.fromDepotName}}</p>
             <p>To : {{ dealerStation.toDealerName}}</p>
+            <ion-badge>{{ (dealerStation.orderCompletionStatus ?? 0) * 100 }}% complete</ion-badge>
             <ion-list>
               <ion-item *ngFor="let quantityItem of dealerStation.orderQuantities">
                 <ion-avatar slot="start">

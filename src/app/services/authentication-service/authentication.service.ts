@@ -39,7 +39,6 @@ export class AuthenticationService {
   );
 
   isDealerUser$ = this.auth$.pipe(
-    tap(res => console.log({res})),
     map(user => user?.stationSpecificRoles.filter(({dealerId}) => !!dealerId).length > 0)
   );
 
@@ -66,9 +65,10 @@ export class AuthenticationService {
           res.data
         )
       })).pipe(map(() => res))),
-      switchMap((res) => from(this.loadStoredToken()).pipe(map(() => res))),
+      switchMap((res) => this.loadStoredToken().pipe(map(() => res))),
       switchMap((res) => this.authUserRequest$.pipe(map(() => res))),
-      switchMap((res) => from(this.loadStoredUser()).pipe(map(() => res))),
+      switchMap((res) => this.loadStoredUser().pipe(map(() => res))),
+      switchMap((res) => from(Preferences.remove({key: PASSWORD_RESET_IDENTIFIER})).pipe(map(() => res))),
     );
 
   passwordChange = (formValue: any) =>

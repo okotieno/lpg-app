@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { LoadingController } from '@ionic/angular';
-import { from } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { from, Observable } from 'rxjs';
+import { finalize, switchMap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -11,24 +11,36 @@ export class LoadingService {
   loaderStartRequestCount = 0;
   loading: HTMLIonLoadingElement;
 
-  loader = from(this.loadingController.create({
-    spinner: 'lines',
-    cssClass: 'loading-wrapper',
-    message: 'Please wait...',
-  }));
+  loader: Observable<HTMLIonLoadingElement> | null = null;
 
   constructor(public loadingController: LoadingController) {
   }
 
   startLoader() {
+    if(this.loader) {
+      console.log('Exists');
+      return this.loader.pipe(
+        switchMap(loader => from(loader.present())),
+      );
+    }
+    this.loader = from(this.loadingController.create({
+      spinner: 'lines',
+      cssClass: 'loading-wrapper',
+      message: 'Please wait...',
+    }));
     return this.loader.pipe(
       switchMap(loader => from(loader.present())),
     );
   }
 
   stopLoader() {
-    this.loader.pipe(
-      switchMap(loader => from(loader.dismiss())),
-    ).subscribe();
+    if (this.loader) {
+      this.loader.pipe(
+        switchMap(loader => from(loader.dismiss())),
+        finalize(() => {
+          this.loader = null;
+        })
+      ).subscribe();
+    }
   }
 }

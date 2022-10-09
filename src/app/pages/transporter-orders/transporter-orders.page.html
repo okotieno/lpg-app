@@ -17,7 +17,15 @@
       <ion-item-sliding *ngFor="let dealerStation of orders">
         <ion-item>
           <ion-label>
-            <h2><strong>Order #{{dealerStation.orderId}}</strong></h2>
+            <ion-row class="ion-justify-content-between ion-align-items-center">
+              <ion-col>
+                <strong>Order #{{dealerStation.orderId}}</strong>
+              </ion-col>
+              <ion-col>
+                <ion-badge>{{ (dealerStation.orderCompletionStatus ?? 0) * 100 }}% complete</ion-badge>
+              </ion-col>
+            </ion-row>
+
             <p>From : {{ dealerStation.fromDepotName}}</p>
             <p>To : {{ dealerStation.toDealerName}}</p>
             <ion-list>

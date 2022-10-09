@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpContext } from '@angular/common/http';
 import { IResponse } from '../../interfaces/i-response';
 import { IOrder } from '../../interfaces/i-order';
+import { SHOW_HTTP_LOADER } from "../../helpers/constants";
 
 @Injectable({
   providedIn: 'root'
@@ -43,7 +44,7 @@ export class OrderService {
   acceptOrder({ orderId }: { orderId: number }) {
     return this.http.post<IResponse<IOrder>>(`${this.url}/${orderId}/status`, {
       acceptOrder: true,
-    });
+    }, {context: new HttpContext().set(SHOW_HTTP_LOADER, true)});
   }
 
   assignOrder({orderId, transporterId}: {
