@@ -6,6 +6,7 @@ import { BehaviorSubject } from 'rxjs';
 import { IOrder } from '../../interfaces/i-order';
 import { ActionSheetController, ViewWillEnter } from '@ionic/angular';
 import { IonItemSliding } from '@ionic/angular/directives/proxies';
+import { PusherService } from '../../services/pusher-service/pusher.service';
 
 @Component({
   selector: 'app-view-received-order',
@@ -37,8 +38,17 @@ export class ViewReceivedOrderPage implements ViewWillEnter {
   constructor(
     private route: ActivatedRoute,
     private ordersService: OrderService,
-    private actionSheetController: ActionSheetController
+    private actionSheetController: ActionSheetController,
+    private pusherService: PusherService
   ) {
+    this.orderId$.pipe(
+      take(1),
+      tap((id) => {
+        this.pusherService.pusher.subscribe(`order.${id}`).bind(`order.updated`, (order: IOrder) => {
+          this.order$.next(order);
+        });
+      })
+    ).subscribe();
   }
 
 
