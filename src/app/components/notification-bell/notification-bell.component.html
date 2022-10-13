@@ -1,0 +1,6 @@
+<ion-button [routerLink]="['/notifications']">
+  <ng-container *ngIf="newNotificationsCount$ | async as newNotificationsCount">
+    <ion-badge *ngIf="newNotificationsCount > 0" color="danger">{{ newNotificationsCount }}</ion-badge>
+  </ng-container>
+  <ion-icon size="large" name="notifications-outline"></ion-icon>
+</ion-button>

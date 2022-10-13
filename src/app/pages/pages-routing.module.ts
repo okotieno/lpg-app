@@ -61,9 +61,19 @@ const routes: Routes = [
         m => m.TransporterToDealerConfirmationModule)
   },
   {
+    path: 'notifications',
+    loadChildren: () =>
+      import('./notifications/notifications.module').then(
+        m => m.NotificationsPageModule)
+  },
+  {
     path: '',
     redirectTo: '/dashboard',
     pathMatch: 'full'
+  },
+  {
+    path: 'notifications',
+    loadChildren: () => import('./notifications/notifications.module').then( m => m.NotificationsPageModule)
   }
 ];
 

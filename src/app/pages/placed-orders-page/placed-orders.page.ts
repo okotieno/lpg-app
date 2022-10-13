@@ -5,6 +5,7 @@ import { OrderService } from '../../services/order-service/order.service';
 import { BehaviorSubject, throwError } from 'rxjs';
 import { IOrder } from '../../interfaces/i-order';
 import { PusherService } from '../../services/pusher-service/pusher.service';
+import { NotificationsService } from '../../services/notifications-service/notifications.service';
 
 @Component({
   selector: 'app-placed-orders-page',
@@ -30,19 +31,10 @@ export class PlacedOrdersPage implements OnInit {
     }),
   );
 
-  // dealerStations$ = this.authenticationService.auth$.pipe(
-  //   map((user) => user.stationSpecificRoles.filter(({dealerId}) => !!dealerId)
-  //     .map(({dealerId}) => dealerId)),
-  //   switchMap((toDealerIds) => {
-  //     this.queryParams = {...this.queryParams, ['toDealerIds[]']: toDealerIds};
-  //     return this.getOrders();
-  //   }),
-  // );
-
   constructor(
     private authenticationService: AuthenticationService,
     private ordersService: OrderService,
-    private pusherService: PusherService
+    private pusherService: PusherService,
   ) {
   }
 
@@ -55,6 +47,19 @@ export class PlacedOrdersPage implements OnInit {
           this.pusherService.pusher.subscribe(`order.dealer.${id}`).bind(`order.created`, (order: IOrder) => {
             this.orders$.next([order, ...this.orders$.value,]);
             this.totalItems += 1;
+          });
+        });
+        ids.forEach(id => {
+          this.pusherService.pusher.subscribe(`order.dealer.${id}`).bind(`order.updated`, (order: IOrder) => {
+            const currentOrders = [...this.orders$.value];
+            const existingOrderIndex = currentOrders.findIndex(({orderId}) => orderId === orderId);
+            if (existingOrderIndex === -1) {
+              this.orders$.next([order, ...this.orders$.value,]);
+              this.totalItems += 1;
+            } else {
+              currentOrders[existingOrderIndex] = {...currentOrders[existingOrderIndex], ...order};
+              this.orders$.next([...currentOrders]);
+            }
           });
         });
       })
