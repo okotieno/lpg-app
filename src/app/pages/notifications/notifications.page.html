@@ -23,10 +23,10 @@
         detail="true" detail-icon="caret-forward-outline"
         (click)="visitNotificationItem(notification.routerLink, i)"
       >
-        <ion-label style="padding-left: 12px;" [style.border-left]="notification.read ? 'rgba(0,128,0,0.3) solid 5px': 'green solid 5px'">
+        <ion-label class="ion-text-wrap" style="padding-left: 12px;" [style.border-left]="notification.read ? 'rgba(0,128,0,0.3) solid 5px': 'green solid 5px'">
           <h3>{{ notification.title }}</h3>
           <p>{{ notification.message }}</p>
-          <p><small>{{ notification.createdAt }}</small></p>
+          <p><small>{{ notification.createdAt | date: 'short' }}</small></p>
         </ion-label>
       </ion-item>
       <ion-item-options side="end">

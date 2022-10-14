@@ -3,6 +3,8 @@ import { map, switchMap, take, tap } from 'rxjs/operators';
 import { AuthenticationService } from '../../services/authentication-service/authentication.service';
 import { OrderService } from '../../services/order-service/order.service';
 import { BehaviorSubject } from 'rxjs';
+import { IOrder } from '../../interfaces/i-order';
+import { PusherService } from '../../services/pusher-service/pusher.service';
 
 @Component({
   selector: 'app-transporter-orders-page',
@@ -20,7 +22,7 @@ export class TransporterOrdersPage implements OnInit {
   };
   lastPage?: number;
   totalItems = 0;
-  dealerStations$ = this.authenticationService.auth$.pipe(
+  transporterStations$ = this.authenticationService.auth$.pipe(
     map((user) => user.stationSpecificRoles.filter(({transporterId}) => !!transporterId)
       .map(({transporterId}) => transporterId)),
     switchMap((assignedToTransporterIds) => {
@@ -31,12 +33,38 @@ export class TransporterOrdersPage implements OnInit {
 
   constructor(
     private authenticationService: AuthenticationService,
-    private ordersService: OrderService
+    private ordersService: OrderService,
+    private pusherService: PusherService
   ) {
   }
 
   ngOnInit() {
-    this.dealerStations$.subscribe();
+    this.transporterStations$.subscribe();
+    this.authenticationService.authTransporterIds.pipe(
+      take(1),
+      tap((ids) => {
+        ids.forEach(id => {
+          ['order.assigned'].forEach((bindType) => {
+            this.pusherService.pusher.subscribe(`order.transporter.${id}`).bind(bindType, (order: IOrder) => {
+              this.updateOrder(order);
+            });
+          });
+        });
+      })
+    ).subscribe();
+  }
+
+
+  updateOrder(order: IOrder) {
+    const currentOrders = [...this.orders$.value];
+    const existingOrderIndex = currentOrders.findIndex(({orderId}) => orderId === orderId);
+    if (existingOrderIndex === -1) {
+      this.orders$.next([order, ...this.orders$.value,]);
+      this.totalItems += 1;
+    } else {
+      currentOrders[existingOrderIndex] = {...currentOrders[existingOrderIndex], ...order};
+      this.orders$.next([...currentOrders]);
+    }
   }
 
   doRefresh($event: any) {
