@@ -24,6 +24,7 @@ export interface IOrder {
   toDealerId: number;
   orderId: number;
   orderQuantities: {
+    canisterBrandId: number;
     canisterBrandName: string;
     canisterSizeId: number;
     canisterSizeName: string;

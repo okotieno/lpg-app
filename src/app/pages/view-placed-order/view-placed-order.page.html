@@ -1,7 +1,7 @@
 <ion-header>
   <ion-toolbar color="primary">
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/received-orders"></ion-back-button>
+      <ion-back-button defaultHref="/placed-orders"></ion-back-button>
     </ion-buttons>
     <ion-title>Placed Order</ion-title>
   </ion-toolbar>
@@ -57,15 +57,32 @@
     <ion-item-sliding #confirmDispatchIonItemSliding [disabled]="!order.depotToTransporter || order.transporterToDealerConfirmed">
       <ion-item>
         <ion-label>
-          <h2>Dispatch</h2>
-          <p *ngIf="!order.depotToTransporter">Order not dispatched</p>
+          <h2>Cylinders from depot</h2>
+          <p *ngIf="!order.depotToTransporter">Not yet dispatched</p>
           <ion-badge *ngIf="order.depotToTransporter" color="success">Dispatched</ion-badge>
-          <p *ngIf="order.depotToTransporter && !order.transporterToDealerConfirmed">Order not confirmed</p>
+          <ion-badge *ngIf="order.transporterToDealerConfirmed" color="success">Confirmed</ion-badge>
+          <p *ngIf="order.depotToTransporter && !order.transporterToDealerConfirmed">Not yet received</p>
         </ion-label>
       </ion-item>
       <ion-item-options side="end">
         <ion-item-option (click)="confirmDispatchIonItemSliding.close()" [routerLink]="['/transporter-to-dealer-confirmation', order.orderId]"><span
           style="padding-left: 32px; padding-right: 32px">Confirm</span></ion-item-option>
+      </ion-item-options>
+    </ion-item-sliding>
+
+    <ion-item-sliding #confirmDispatchIonItemSliding1 [disabled]="!order.transporterToDepot">
+      <ion-item>
+        <ion-label>
+          <h2>Empty cylinders</h2>
+          <p *ngIf="!order.dealerToTransporter">Not yet dispatched</p>
+          <ion-badge *ngIf="order.dealerToTransporter" color="success">Dispatched</ion-badge>
+          <ion-badge *ngIf="order.transporterToDepotConfirmed" color="success">Confirmed</ion-badge>
+          <p *ngIf="order.dealerToTransporter && !order.transporterToDepotConfirmed">Not yet confirmed</p>
+        </ion-label>
+      </ion-item>
+      <ion-item-options side="end">
+        <ion-item-option (click)="confirmDispatchIonItemSliding1.close()" [routerLink]="['/dispatch-from-dealer', order.orderId]"><span
+          style="padding-left: 32px; padding-right: 32px">Dispatch</span></ion-item-option>
       </ion-item-options>
     </ion-item-sliding>
   </ng-container>

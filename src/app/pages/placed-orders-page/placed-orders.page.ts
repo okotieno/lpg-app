@@ -5,7 +5,6 @@ import { OrderService } from '../../services/order-service/order.service';
 import { BehaviorSubject, throwError } from 'rxjs';
 import { IOrder } from '../../interfaces/i-order';
 import { PusherService } from '../../services/pusher-service/pusher.service';
-import { NotificationsService } from '../../services/notifications-service/notifications.service';
 
 @Component({
   selector: 'app-placed-orders-page',
@@ -44,26 +43,26 @@ export class PlacedOrdersPage implements OnInit {
       take(1),
       tap((ids) => {
         ids.forEach(id => {
-          this.pusherService.pusher.subscribe(`order.dealer.${id}`).bind(`order.created`, (order: IOrder) => {
-            this.orders$.next([order, ...this.orders$.value,]);
-            this.totalItems += 1;
-          });
-        });
-        ids.forEach(id => {
-          this.pusherService.pusher.subscribe(`order.dealer.${id}`).bind(`order.updated`, (order: IOrder) => {
-            const currentOrders = [...this.orders$.value];
-            const existingOrderIndex = currentOrders.findIndex(({orderId}) => orderId === orderId);
-            if (existingOrderIndex === -1) {
-              this.orders$.next([order, ...this.orders$.value,]);
-              this.totalItems += 1;
-            } else {
-              currentOrders[existingOrderIndex] = {...currentOrders[existingOrderIndex], ...order};
-              this.orders$.next([...currentOrders]);
-            }
+          ['order.created', 'order.updated'].forEach((bindType) => {
+            this.pusherService.pusher.subscribe(`order.dealer.${id}`).bind(bindType, (order: IOrder) => {
+              this.updateOrder(order);
+            });
           });
         });
       })
     ).subscribe();
+  }
+
+  updateOrder(order: IOrder) {
+    const currentOrders = [...this.orders$.value];
+    const existingOrderIndex = currentOrders.findIndex(({orderId}) => orderId === orderId);
+    if (existingOrderIndex === -1) {
+      this.orders$.next([order, ...this.orders$.value,]);
+      this.totalItems += 1;
+    } else {
+      currentOrders[existingOrderIndex] = {...currentOrders[existingOrderIndex], ...order};
+      this.orders$.next([...currentOrders]);
+    }
   }
 
   doRefresh($event: any) {

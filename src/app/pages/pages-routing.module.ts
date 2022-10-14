@@ -42,6 +42,10 @@ const routes: Routes = [
     loadChildren: () => import('./dispatch-from-depot/dispatch-from-depot.module').then(m => m.DispatchFromDepotModule)
   },
   {
+    path: 'dispatch-from-dealer/:orderId',
+    loadChildren: () => import('./dispatch-from-dealer/dispatch-from-dealer.module').then(m => m.DispatchFromDealerPageModule)
+  },
+  {
     path: 'transporter-orders',
     loadChildren: () => import('./transporter-orders/transporter-orders.module').then(m => m.TransporterOrdersModule)
   },

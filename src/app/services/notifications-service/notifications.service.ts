@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { map, take, tap } from 'rxjs/operators';
-import { IOrder } from '../../interfaces/i-order';
+import { map, tap } from 'rxjs/operators';
 import { AuthenticationService } from '../authentication-service/authentication.service';
 import { PusherService } from '../pusher-service/pusher.service';
 import { NOTIFICATIONS_KEY } from '../../helpers/constants';
@@ -13,6 +12,14 @@ interface INotification {
   createdAt: string;
   read: boolean;
   routerLink: string[];
+}
+
+interface IMessage {
+  orderId: number;
+  message: string;
+  time: string;
+  title: string;
+  type: string;
 }
 
 @Injectable({
@@ -33,27 +40,21 @@ export class NotificationsService {
         this.notifications$.next(JSON.parse(res.value));
       }
     });
-    authenticationService.authDealerIds.pipe(
-      take(1),
-      tap((ids) => {
-        ids.forEach(id => {
-          pusherService.pusher.subscribe(`order.dealer.${id}`).bind(`order.created`, (order: IOrder) => {
-            this.updateNotification({
-              createdAt: new Date().toDateString(), message: `Order Id: #${order.orderId}`, read: false,
-              title: 'New Order',
-              routerLink: ['/view-placed-order', String(order.orderId)]
-            });
+
+    authenticationService.auth$.pipe(
+      map(({userId}) => userId),
+      tap((userId) => {
+        pusherService.pusher.subscribe(`private-App.Models.User.${userId}`)
+          .bind_global((eventName: string, message: IMessage) => {
+            if (message.message) {
+              this.updateNotification({
+                createdAt: message.time,
+                message: message.message, read: false,
+                title: message.title,
+                routerLink: ['/view-placed-order', String(message.orderId)]
+              });
+            }
           });
-        });
-        ids.forEach(id => {
-          pusherService.pusher.subscribe(`order.dealer.${id}`).bind(`order.updated`, (order: IOrder) => {
-            this.updateNotification({
-              createdAt: new Date().toDateString(), message: `Order Id: #${order.orderId}`, read: false,
-              title: 'Updated Order',
-              routerLink: ['/view-placed-order', String(order.orderId)]
-            });
-          });
-        });
       })
     ).subscribe();
   }

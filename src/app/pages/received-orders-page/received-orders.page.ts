@@ -42,13 +42,27 @@ export class ReceivedOrdersPage implements OnInit {
       take(1),
       tap((ids) => {
         ids.forEach(id => {
-          this.pusherService.pusher.subscribe(`order.depot.${id}`).bind(`order.created`, (order: IOrder) => {
-            this.orders$.next([order, ...this.orders$.value,]);
-            this.totalItems += 1;
+          ['order.created', 'order.updated'].forEach((bindType) => {
+            this.pusherService.pusher.subscribe(`order.depot.${id}`).bind(bindType, (order: IOrder) => {
+              this.updateOrder(order);
+            });
           });
         });
       })
     ).subscribe();
+  }
+
+  updateOrder(order: IOrder) {
+    const currentOrders = [...this.orders$.value];
+    const existingOrderIndex = currentOrders.findIndex(({orderId}) => orderId === orderId);
+    console.log({existingOrderIndex});
+    if (existingOrderIndex === -1) {
+      this.orders$.next([order, ...this.orders$.value]);
+      this.totalItems += 1;
+    } else {
+      currentOrders[existingOrderIndex] = {...currentOrders[existingOrderIndex], ...order};
+      this.orders$.next([...currentOrders]);
+    }
   }
 
   doRefresh($event: any) {
