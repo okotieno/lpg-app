@@ -21,6 +21,7 @@ export class ViewTransporterOrderPage implements ViewWillEnter, OnInit {
 
   order$ = new BehaviorSubject<IOrder>({
     acceptedAt: '',
+    createdAt: '',
     assignedAt: '',
     canisterSizeName: '',
     dealerToTransporter: false,

@@ -21,6 +21,7 @@ export class ViewReceivedOrderPage implements ViewWillEnter {
 
   order$ = new BehaviorSubject<IOrder>({
     acceptedAt: '',
+    createdAt: '',
     assignedAt: '',
     canisterSizeName: '',
     dealerToTransporter: false,

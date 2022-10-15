@@ -1,0 +1,49 @@
+<ion-item>
+  <ion-label>
+    <ion-row class="ion-justify-content-between ion-align-items-center ion-no-padding ion-no-margin">
+      <ion-col size="7" class="ion-no-padding">
+        <strong>Order #{{order.orderId}}</strong>
+      </ion-col>
+      <ion-col size="5" class="font-size-12 ion-no-padding">
+        <div>{{ order.createdAt | date: 'short'}}</div>
+      </ion-col>
+    </ion-row>
+    <p>From : {{ order.fromDepotName}}</p>
+    <p>To : {{ order.toDealerName}}</p>
+    <ion-badge [color]="order.orderCompletionStatus > 0.9 ? 'success' : 'danger'">{{ (order.orderCompletionStatus ?? 0) * 100 }}% Complete</ion-badge>
+  </ion-label>
+</ion-item>
+
+<ion-segment [(ngModel)]="activeTab" value="all">
+  <ion-segment-button value="actions">
+    Actions
+  </ion-segment-button>
+  <ion-segment-button value="status">
+    Status
+  </ion-segment-button>
+  <ion-segment-button value="orders">
+    Orders
+  </ion-segment-button>
+</ion-segment>
+
+<ion-list *ngIf="activeTab === 'orders'">
+  <ion-item *ngFor="let quantityItem of order.orderQuantities">
+    <ion-avatar slot="start">
+      <ion-icon name="calendar"></ion-icon>
+    </ion-avatar>
+    <ion-label>
+      <h3>{{ quantityItem.canisterSizeName }} {{ quantityItem.canisterBrandName}}</h3>
+      <p>Quantity {{ quantityItem.quantity }}</p>
+    </ion-label>
+  </ion-item>
+</ion-list>
+
+<ng-template
+  [ngTemplateOutlet]="statusTemplate"
+  *ngIf="activeTab === 'status'"
+></ng-template>
+
+<ng-template
+  [ngTemplateOutlet]="actionsTemplate"
+  *ngIf="activeTab === 'actions'"
+></ng-template>

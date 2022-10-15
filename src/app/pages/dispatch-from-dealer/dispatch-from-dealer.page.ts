@@ -24,6 +24,7 @@ export class DispatchFromDealerPage extends formMixin() implements OnInit {
   );
   order$ = new BehaviorSubject<IOrder>({
     acceptedAt: '',
+    createdAt: '',
     assignedAt: '',
     canisterSizeName: '',
     dealerToTransporter: false,
@@ -56,13 +57,15 @@ export class DispatchFromDealerPage extends formMixin() implements OnInit {
       tap((order) => this.order$.next(order)),
       tap((order) => {
         order.orderQuantities.forEach((item) => {
-          (this.form.get('canisters') as FormArray).push(this.fb.group({
-            tagged: [false],
-            canisterBrandId: item.canisterBrandId,
-            canisterSizeId: item.canisterSizeId,
-            inGoodCondition: true,
-            canisterConditionDescription: null
-          }));
+          for (let i = 0; i < item.quantity; i++) {
+            (this.form.get('canisters') as FormArray).push(this.fb.group({
+              tagged: [false],
+              canisterBrandId: item.canisterBrandId,
+              canisterSizeId: item.canisterSizeId,
+              inGoodCondition: true,
+              canisterConditionDescription: null
+            }));
+          }
         });
       })
     ).subscribe();

@@ -14,7 +14,7 @@
         <h2><strong>Order #{{order.orderId}} </strong></h2>
         <p>From : {{ order.fromDepotName}}</p>
         <p>To : {{ order.toDealerName}}</p>
-        <ion-badge>{{ order.orderCompletionStatus * 100 }}% complete</ion-badge>
+        <ion-badge [color]="order.orderCompletionStatus > 0.9 ? 'success' : 'danger'">{{ (order.orderCompletionStatus ?? 0) * 100 }}% Complete</ion-badge>
       </ion-label>
     </ion-item>
     <ion-list>
@@ -52,7 +52,10 @@
       <ion-item>
         <ion-label>
           <h2>Transporter</h2>
-          <p *ngIf="!order.isAssigned">Order not assigned</p>
+          <p *ngIf="!order.isAssigned">
+            Order not yet assigned
+            <ion-icon size="small" name="alert-circle-outline" color="danger"></ion-icon>
+          </p>
           <ion-badge *ngIf="order.isAssigned" color="success">Assigned</ion-badge>
           <p *ngIf="order.isAssigned">To: {{ order.assignedToTransporterName }}</p>
 
@@ -68,7 +71,10 @@
       <ion-item>
         <ion-label>
           <h2>Dispatch</h2>
-          <p *ngIf="!order.depotToTransporter">Order not dispatched</p>
+          <p *ngIf="!order.depotToTransporter">
+            Cylinders not yet dispatched
+            <ion-icon size="small" name="alert-circle-outline" color="danger"></ion-icon>
+          </p>
           <ion-badge *ngIf="order.depotToTransporter" color="success">Dispatched</ion-badge>
 
         </ion-label>

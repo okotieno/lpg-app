@@ -14,7 +14,7 @@
         <h2><strong>Order #{{order.orderId}} </strong></h2>
         <p>From : {{ order.fromDepotName}}</p>
         <p>To : {{ order.toDealerName}}</p>
-        <ion-badge>{{ (order.orderCompletionStatus ?? 0) * 100 }}% complete</ion-badge>
+        <ion-badge [color]="order.orderCompletionStatus > 0.9 ? 'success' : 'danger'">{{ (order.orderCompletionStatus ?? 0) * 100 }}% Complete</ion-badge>
       </ion-label>
     </ion-item>
 
@@ -43,6 +43,13 @@
           <ion-badge style="margin-right: 10px" *ngIf="order.transporterToDealerConfirmed" color="success">
             Delivered
           </ion-badge>
+          <ion-row *ngIf="!depotToTransporterIonItemSliding.disabled" class="ion-justify-content-between ion-align-items-center ion-no-margin ion-no-padding font-size-12">
+            <ion-col size="2"></ion-col>
+            <ion-col size="6" class="ion-no-margin ion-no-padding">Swipe to confirm</ion-col>
+            <ion-col size="2">
+              <ion-icon name="play-back-outline"></ion-icon>
+            </ion-col>
+          </ion-row>
         </ion-label>
       </ion-item>
       <ion-item-options side="end">
@@ -82,6 +89,13 @@
         <ion-item-option (click)="dealerToTransporterIonItemSliding.close()" [routerLink]="['/dispatch-from-depot', order.orderId]"><span
           style="padding-left: 32px; padding-right: 32px">Collect</span></ion-item-option>
       </ion-item-options>
+      <ion-row *ngIf="!dealerToTransporterIonItemSliding.disabled" class="ion-justify-content-between ion-align-items-center ion-no-margin ion-no-padding font-size-12">
+        <ion-col size="2"></ion-col>
+        <ion-col size="6" class="ion-no-margin ion-no-padding">Swipe to collect</ion-col>
+        <ion-col size="2">
+          <ion-icon name="play-back-outline"></ion-icon>
+        </ion-col>
+      </ion-row>
     </ion-item-sliding>
   </ng-container>
 

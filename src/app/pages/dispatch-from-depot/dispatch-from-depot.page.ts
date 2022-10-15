@@ -33,6 +33,7 @@ export class DispatchFromDepotPage extends formMixin() implements OnInit {
 
   order$ = new BehaviorSubject<IOrder>({
     acceptedAt: '',
+    createdAt: '',
     assignedAt: '',
     canisterSizeName: '',
     dealerToTransporter: false,

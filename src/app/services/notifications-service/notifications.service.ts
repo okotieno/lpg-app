@@ -11,10 +11,11 @@ interface INotification {
   message: string;
   createdAt: string;
   read: boolean;
-  routerLink: string[];
+  routerLink: string[] | null;
 }
 
 interface IMessage {
+  stationType: 'depot' | 'transporter' | 'dealer';
   orderId: number;
   message: string;
   time: string;
@@ -42,16 +43,23 @@ export class NotificationsService {
     });
 
     authenticationService.auth$.pipe(
-      map(({userId}) => userId),
-      tap((userId) => {
+      tap(({userId, stationSpecificRoles}) => {
         pusherService.pusher.subscribe(`private-App.Models.User.${userId}`)
           .bind_global((eventName: string, message: IMessage) => {
             if (message.message) {
+              let routerLink: string[] | null = null;
+              if (message.stationType === 'depot') {
+                routerLink = ['/view-received-order', String(message.orderId)];
+              } else if (message.stationType === 'dealer') {
+                routerLink = ['/view-placed-order', String(message.orderId)];
+              } else if(message.stationType === 'transporter') {
+                routerLink = ['/view-transporter-order', String(message.orderId)];
+              }
               this.updateNotification({
                 createdAt: message.time,
                 message: message.message, read: false,
                 title: message.title,
-                routerLink: ['/view-placed-order', String(message.orderId)]
+                routerLink
               });
             }
           });

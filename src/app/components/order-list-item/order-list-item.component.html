@@ -1,0 +1,31 @@
+<ion-item>
+  <ion-label>
+    <ion-row class="ion-justify-content-between ion-align-items-center ion-no-padding ion-no-margin">
+      <ion-col size="6" class="ion-no-padding">
+        <strong>Order #{{order.orderId}}</strong>
+      </ion-col>
+      <ion-col size="6" class="font-size-12 ion-no-padding">
+        <div>{{ order.createdAt | date: 'medium'}}</div>
+      </ion-col>
+    </ion-row>
+    <p>From : {{ order.fromDepotName}}</p>
+    <p>To : {{ order.toDealerName}}</p>
+    <p>
+      <ion-badge [color]="order.orderCompletionStatus > 0.9 ? 'success' : 'danger'">{{ (order.orderCompletionStatus ?? 0) * 100 }}% Complete</ion-badge>
+    </p>
+    <ion-list lines="none">
+      <ion-item *ngFor="let quantityItem of order.orderQuantities">
+        <ion-icon slot="start" name="calendar"></ion-icon>
+        <ion-label class="ion-text-wrap">
+          <h3>{{ quantityItem.canisterSizeName }} {{ quantityItem.canisterBrandName}}</h3>
+          <p>Quantity {{ quantityItem.quantity }}</p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+    <ion-item lines="none">
+      <ion-label>
+        <ion-button color="primary" [routerLink]="[baseViewUrl, order.orderId]">View</ion-button>
+      </ion-label>
+    </ion-item>
+  </ion-label>
+</ion-item>

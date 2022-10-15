@@ -32,6 +32,7 @@ export class TransporterToDealerConfirmationPage extends formMixin() implements 
 
   order$ = new BehaviorSubject<IOrder>({
     acceptedAt: '',
+    createdAt: '',
     assignedAt: '',
     canisterSizeName: '',
     dealerToTransporter: false,

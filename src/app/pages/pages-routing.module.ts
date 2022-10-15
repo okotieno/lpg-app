@@ -2,6 +2,9 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
 import { PagesPage } from './pages.page';
+import { DealerGuard } from '../guards/dealer-guard/dealer.guard';
+import { DepotGuard } from '../guards/depot-guard/depot.guard';
+import { TransporterGuard } from '../guards/transporter-guard/transporter.guard';
 
 const routes: Routes = [
   {
@@ -15,54 +18,66 @@ const routes: Routes = [
   },
   {
     path: 'make-order',
-    loadChildren: () => import('./make-order-page/make-order-page.module').then(m => m.MakeOrderPagePageModule)
+    loadChildren: () => import('./make-order-page/make-order-page.module').then(m => m.MakeOrderPagePageModule),
+    canLoad: [DealerGuard]
   },
   {
     path: 'placed-orders',
-    loadChildren: () => import('./placed-orders-page/placed-orders.page.module').then(m => m.PlacedOrdersPageModule)
+    loadChildren: () => import('./placed-orders-page/placed-orders.page.module').then(m => m.PlacedOrdersPageModule),
+    canLoad: [DealerGuard]
   },
   {
     path: 'received-orders',
-    loadChildren: () => import('./received-orders-page/received-orders.page.module').then(m => m.ReceivedOrdersPageModule)
+    loadChildren: () => import('./received-orders-page/received-orders.page.module').then(m => m.ReceivedOrdersPageModule),
+    canLoad: [DepotGuard]
   },
   {
     path: 'view-placed-order/:orderId',
-    loadChildren: () => import('./view-placed-order/view-placed-order.module').then( m => m.ViewPlacedOrderPageModule)
+    loadChildren: () => import('./view-placed-order/view-placed-order.module').then(m => m.ViewPlacedOrderPageModule),
+    canLoad: [DealerGuard]
   },
   {
     path: 'view-received-order/:orderId',
-    loadChildren: () => import('./view-received-order/view-received-order.module').then( m => m.ViewReceivedOrderPageModule)
+    loadChildren: () => import('./view-received-order/view-received-order.module').then( m => m.ViewReceivedOrderPageModule),
+    canLoad: [DepotGuard]
   },
   {
     path: 'assign-order/:orderId',
-    loadChildren: () => import('./assign-order/assign-order.module').then( m => m.AssignOrderPageModule)
+    loadChildren: () => import('./assign-order/assign-order.module').then( m => m.AssignOrderPageModule),
+    canLoad: [DepotGuard]
   },
   {
     path: 'dispatch-from-depot/:orderId',
-    loadChildren: () => import('./dispatch-from-depot/dispatch-from-depot.module').then(m => m.DispatchFromDepotModule)
+    loadChildren: () => import('./dispatch-from-depot/dispatch-from-depot.module').then(m => m.DispatchFromDepotModule),
+    canLoad: [DepotGuard]
   },
   {
     path: 'dispatch-from-dealer/:orderId',
-    loadChildren: () => import('./dispatch-from-dealer/dispatch-from-dealer.module').then(m => m.DispatchFromDealerPageModule)
+    loadChildren: () => import('./dispatch-from-dealer/dispatch-from-dealer.module').then(m => m.DispatchFromDealerPageModule),
+    canLoad: [DealerGuard]
   },
   {
     path: 'transporter-orders',
-    loadChildren: () => import('./transporter-orders/transporter-orders.module').then(m => m.TransporterOrdersModule)
+    loadChildren: () => import('./transporter-orders/transporter-orders.module').then(m => m.TransporterOrdersModule),
+    canLoad: [TransporterGuard]
   },
   {
     path: 'view-transporter-order/:orderId',
-    loadChildren: () => import('./view-transporter-order/view-transporter-order.module').then(m => m.ViewTransporterOrderModule)
+    loadChildren: () => import('./view-transporter-order/view-transporter-order.module').then(m => m.ViewTransporterOrderModule),
+    canLoad: [TransporterGuard]
   },
   {
     path: 'dispatch-from-depot-confirmation/:orderId',
     loadChildren: () =>
-      import('./dispatch-from-depot-confirmation/dispatch-from-depot-confirmation.module').then(m => m.DispatchFromDepotConfirmationModule)
+      import('./dispatch-from-depot-confirmation/dispatch-from-depot-confirmation.module').then(m => m.DispatchFromDepotConfirmationModule),
+    canLoad: [TransporterGuard]
   },
   {
     path: 'transporter-to-dealer-confirmation/:orderId',
     loadChildren: () =>
       import('./transporter-to-dealer-confirmation/transporter-to-dealer-confirmation.module').then(
-        m => m.TransporterToDealerConfirmationModule)
+        m => m.TransporterToDealerConfirmationModule),
+    canLoad: [DealerGuard]
   },
   {
     path: 'notifications',

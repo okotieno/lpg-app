@@ -1,4 +1,5 @@
 export interface IOrder {
+  createdAt: string;
   orderCompletionStatus?: number;
   fromDepotName?: string;
   toDealerName?: string;

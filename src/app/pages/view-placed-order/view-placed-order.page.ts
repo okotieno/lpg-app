@@ -21,6 +21,7 @@ export class ViewPlacedOrderPage implements ViewWillEnter, OnInit {
 
   order$ = new BehaviorSubject<IOrder>({
     acceptedAt: '',
+    createdAt: '',
     assignedAt: '',
     canisterSizeName: '',
     dealerToTransporter: false,
@@ -55,15 +56,16 @@ export class ViewPlacedOrderPage implements ViewWillEnter, OnInit {
 
 
   ionViewWillEnter() {
-    this.getOrder();
+    this.getOrder().pipe(
+      take(1)
+    ).subscribe();
   }
 
   getOrder() {
-    this.orderId$.pipe(
+    return this.orderId$.pipe(
       switchMap((orderId) => this.ordersService.getItemWithId(+orderId)),
-      tap(({data}) => this.order$.next(data)),
-      take(1)
-    ).subscribe();
+      tap(({data}) => this.order$.next(data))
+    );
   }
 
   async acceptOrder(slidingItemOrderStatus: IonItemSliding) {
@@ -96,5 +98,14 @@ export class ViewPlacedOrderPage implements ViewWillEnter, OnInit {
         })
       ).subscribe();
     }
+  }
+
+
+  doRefresh($event: any) {
+    // this.orders$.next([]);
+    this.getOrder().pipe(
+      take(1),
+      tap(() => $event.target.complete())
+    ).subscribe();
   }
 }
