@@ -87,6 +87,13 @@ const routes: Routes = [
     canLoad: [DealerGuard]
   },
   {
+    path: 'transporter-to-depot-confirmation/:orderId',
+    loadChildren: () =>
+      import('./transporter-to-depot-confirmation/transporter-to-depot-confirmation.module').then(
+        m => m.TransporterToDepotConfirmationModule),
+    canLoad: [DepotGuard]
+  },
+  {
     path: 'notifications',
     loadChildren: () =>
       import('./notifications/notifications.module').then(

@@ -76,7 +76,7 @@
     </ng-template>
     <ng-template #actionsTemplate>
       <ion-list>
-        <ion-item button detail="true" [disabled]="!order.depotToTransporter || order.transporterToDealerConfirmed">
+        <ion-item button detail="true" [disabled]="!order.depotToTransporterConfirmed || order.transporterToDealerConfirmed">
           <ion-icon name="checkmark-done-outline" slot="start"></ion-icon>
           <ion-label class="ion-text-wrap" [routerLink]="['/transporter-to-dealer-confirmation', order.orderId]">
             <h2>Confirm</h2>
@@ -92,8 +92,8 @@
         </ion-item>
         <ion-item>
           <ion-label class="ion-text-wrap">
-            <p *ngIf="!order.depotToTransporter">
-              *Awaiting dispatch from depot
+            <p *ngIf="!order.depotToTransporterConfirmed">
+              *Awaiting dispatch from depot to be confirmed
               <ion-icon color="danger" name="close-circle-outline"></ion-icon>
             </p>
             <p *ngIf="!order.isAssigned">

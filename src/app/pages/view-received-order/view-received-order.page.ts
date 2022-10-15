@@ -1,11 +1,10 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { map, switchMap, take, tap } from 'rxjs/operators';
+import { catchError, map, switchMap, take, tap } from 'rxjs/operators';
 import { OrderService } from '../../services/order-service/order.service';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, throwError } from 'rxjs';
 import { IOrder } from '../../interfaces/i-order';
 import { ActionSheetController, ViewWillEnter } from '@ionic/angular';
-import { IonItemSliding } from '@ionic/angular/directives/proxies';
 import { PusherService } from '../../services/pusher-service/pusher.service';
 
 @Component({
@@ -54,18 +53,19 @@ export class ViewReceivedOrderPage implements ViewWillEnter {
 
 
   ionViewWillEnter() {
-    this.getOrder();
-  }
-
-  getOrder() {
-    this.orderId$.pipe(
-      switchMap((orderId) => this.ordersService.getItemWithId(+orderId)),
-      tap(({data}) => this.order$.next(data)),
+    this.getOrder().pipe(
       take(1)
     ).subscribe();
   }
 
-  async acceptOrder(slidingItemOrderStatus: IonItemSliding) {
+  getOrder() {
+    return this.orderId$.pipe(
+      switchMap((orderId) => this.ordersService.getItemWithId(+orderId)),
+      tap(({data}) => this.order$.next(data)),
+    );
+  }
+
+  async acceptOrder() {
     const actionSheet = await this.actionSheetController.create({
       header: 'Accept Order',
       cssClass: 'ion-danger',
@@ -91,9 +91,50 @@ export class ViewReceivedOrderPage implements ViewWillEnter {
         take(1),
         tap(({data: res}) => {
           this.order$.next(res);
-          slidingItemOrderStatus.close();
         })
       ).subscribe();
     }
+  }
+
+  async declineOrder() {
+    const actionSheet = await this.actionSheetController.create({
+      header: 'Decline Order',
+      cssClass: 'ion-color-danger',
+      buttons: [{
+        text: 'Please confirm',
+        icon: 'ban-outline',
+        id: 'decline-button',
+        data: {
+          type: 'accept'
+        },
+      }, {
+        text: 'Cancel',
+        icon: 'close',
+        role: 'cancel',
+      }]
+    });
+    await actionSheet.present();
+
+    const {data} = await actionSheet.onDidDismiss();
+    if (data) {
+      this.orderId$.pipe(
+        switchMap(orderId => this.ordersService.declineOrder({orderId: +orderId})),
+        take(1),
+        tap(({data: res}) => {
+          this.order$.next(res);
+        })
+      ).subscribe();
+    }
+  }
+
+  doRefresh($event: any) {
+    this.getOrder().pipe(
+      take(1),
+      tap(() => $event.target.complete()),
+      catchError((err) => {
+        $event.target.complete();
+        return throwError(err);
+      })
+    ).subscribe();
   }
 }

@@ -1,0 +1,67 @@
+<ng-container *ngIf="v$ | async as v">
+  <ion-header>
+    <ion-toolbar color="primary">
+      <ion-buttons slot="start">
+        <ion-back-button *ngIf="!v.scanning" [defaultHref]="'/view-received-order/' + v.order.orderId"></ion-back-button>
+      </ion-buttons>
+      <ion-title *ngIf="v.scanning">Scanning...</ion-title>
+      <ion-title *ngIf="!v.scanning">Dispatch</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  <ion-content >
+    <ng-container *ngIf="!v.scanning">
+      <ion-item>
+        <ion-label>
+          <h2><strong>Order #{{v.order.orderId}} </strong></h2>
+          <p>From : {{ v.order.fromDepotName}}</p>
+          <p>To : {{ v.order.toDealerName}}</p>
+        </ion-label>
+      </ion-item>
+
+      <ion-list>
+        <ion-list-header>Dispatch Summary</ion-list-header>
+        <ion-item *ngFor="let dispatchCylinder of v.order.orderQuantities">
+          <ion-label class="ion-text-wrap">
+            <h2>{{ dispatchCylinder.canisterBrandName }} - {{ dispatchCylinder.canisterSizeName }}</h2>
+            <p>({{ dispatchCylinder.quantity }} items)</p>
+          </ion-label>
+          <ion-checkbox slot="end"></ion-checkbox>
+        </ion-item>
+      </ion-list>
+
+<!--      <ion-item>-->
+<!--        <ion-buttons>-->
+<!--          <ion-button color="primary"  (click)="scan()">Start Scanning</ion-button>-->
+<!--        </ion-buttons>-->
+
+<!--      </ion-item>-->
+
+      <form [formGroup]="form" (ngSubmit)="submitOrderDispatch()">
+        <ion-item *ngIf="formError$ | async as formError">
+         <ion-label color="danger" class="ion-text-wrap">
+           <strong style="font-size: 10px" *ngIf="formError.message"> {{ formError.message }}</strong>
+           <div class="ion-color-danger" style="line-height: 12px" *ngIf="formError.errors['canisters']">
+             <ion-icon style="font-size: 10px" color="danger" name="information-circle-outline"></ion-icon>
+             <span style="font-size: 10px; line-height: 10px">{{ formError.errors['canisters'][0] }}</span>
+           </div>
+         </ion-label>
+        </ion-item>
+        <ion-row>
+          <ion-col>
+            <ion-button *ngIf="(submitting$ | async) === false" [disabled]="form.invalid"
+                        type="submit" color="success" expand="block">
+              Confirm
+              <ion-icon name="log-in"></ion-icon>
+            </ion-button>
+            <ion-button *ngIf="(submitting$ | async)" color="success" expand="block">
+              Confirming...
+              <ion-spinner name="lines"></ion-spinner>
+            </ion-button>
+          </ion-col>
+        </ion-row>
+
+      </form>
+
+    </ng-container>
+  </ion-content>
+</ng-container>

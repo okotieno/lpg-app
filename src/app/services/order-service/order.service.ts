@@ -47,6 +47,12 @@ export class OrderService {
     }, {context: new HttpContext().set(SHOW_HTTP_LOADER, true)});
   }
 
+  declineOrder({ orderId }: { orderId: number }) {
+    return this.http.post<IResponse<IOrder>>(`${this.url}/${orderId}/status`, {
+      declineOrder: true,
+    }, {context: new HttpContext().set(SHOW_HTTP_LOADER, true)});
+  }
+
   assignOrder({orderId, transporterId}: {
     orderId: number;
     transporterId: number;
