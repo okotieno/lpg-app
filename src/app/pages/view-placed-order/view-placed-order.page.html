@@ -13,7 +13,6 @@
   </ion-refresher>
 
   <ng-container *ngIf="order$ | async as order">
-
     <app-view-order-item
       [order]="order"
       [statusTemplate]="statusTemplate"

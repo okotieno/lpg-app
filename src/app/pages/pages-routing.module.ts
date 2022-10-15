@@ -73,6 +73,13 @@ const routes: Routes = [
     canLoad: [TransporterGuard]
   },
   {
+    path: 'dispatch-from-dealer-confirmation/:orderId',
+    loadChildren: () =>
+      import('./dispatch-from-dealer-confirmation/dispatch-from-dealer-confirmation.module')
+        .then(m => m.DispatchFromDealerConfirmationModule),
+    canLoad: [TransporterGuard]
+  },
+  {
     path: 'transporter-to-dealer-confirmation/:orderId',
     loadChildren: () =>
       import('./transporter-to-dealer-confirmation/transporter-to-dealer-confirmation.module').then(

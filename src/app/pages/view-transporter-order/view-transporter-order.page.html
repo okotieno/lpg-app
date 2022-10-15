@@ -8,95 +8,112 @@
 </ion-header>
 
 <ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
   <ng-container *ngIf="order$ | async as order">
-    <ion-item>
-      <ion-label>
-        <h2><strong>Order #{{order.orderId}} </strong></h2>
-        <p>From : {{ order.fromDepotName}}</p>
-        <p>To : {{ order.toDealerName}}</p>
-        <ion-badge [color]="order.orderCompletionStatus > 0.9 ? 'success' : 'danger'">{{ (order.orderCompletionStatus ?? 0) * 100 }}% Complete</ion-badge>
-      </ion-label>
-    </ion-item>
+    <app-view-order-item
+      [order]="order"
+      [statusTemplate]="statusTemplate"
+      [actionsTemplate]="actionsTemplate"
+    ></app-view-order-item>
+    <ng-template #statusTemplate>
+      <ion-list>
+        <ion-item>
+          <ion-label class="ion-text-wrap">
+            <h2>Refilled cylinders from depot</h2>
+            <p *ngIf="!order.depotToTransporter">
+              Cylinders not yet dispatched
+              <ion-icon size="small" name="alert-circle-outline" color="danger"></ion-icon>
+            </p>
+            <p *ngIf="!order.depotToTransporterConfirmed && order.depotToTransporter">
+              Cylinders not yet confirmed
+              <ion-icon size="small" name="alert-circle-outline" color="danger"></ion-icon>
+            </p>
+            <p *ngIf="!order.transporterToDealerConfirmed && order.depotToTransporterConfirmed">
+              Cylinders not yet delivered
+              <ion-icon size="small" name="alert-circle-outline" color="danger"></ion-icon>
+            </p>
+            <ion-badge style="margin-right: 10px" *ngIf="order.depotToTransporter" color="success">
+              Dispatched
+            </ion-badge>
+            <ion-badge style="margin-right: 10px" *ngIf="order.depotToTransporterConfirmed" color="success">
+              Confirmed
+            </ion-badge>
+            <ion-badge style="margin-right: 10px" *ngIf="order.transporterToDealerConfirmed" color="success">
+              Delivered
+            </ion-badge>
+          </ion-label>
+        </ion-item>
+        <ion-item>
+          <ion-label class="ion-text-wrap">
+            <h2>Empty cylinders from dealer</h2>
+            <p *ngIf="!order.dealerToTransporter">
+              Cylinders not yet dispatched
+              <ion-icon size="small" name="alert-circle-outline" color="danger"></ion-icon>
+            </p>
+            <p *ngIf="!order.dealerToTransporterConfirmed && order.dealerToTransporter">
+              Cylinders not yet confirmed
+              <ion-icon size="small" name="alert-circle-outline" color="danger"></ion-icon>
+            </p>
+            <p *ngIf="!order.transporterToDepotConfirmed && order.dealerToTransporterConfirmed">
+              Cylinders not yet delivered
+              <ion-icon size="small" name="alert-circle-outline" color="danger"></ion-icon>
+            </p>
+            <ion-badge style="margin-right: 10px" *ngIf="order.dealerToTransporter" color="success">
+              Dispatched
+            </ion-badge>
+            <ion-badge style="margin-right: 10px" *ngIf="order.dealerToTransporterConfirmed" color="success">
+              Confirmed
+            </ion-badge>
+            <ion-badge style="margin-right: 10px" *ngIf="order.transporterToDepotConfirmed" color="success">
+              Delivered
+            </ion-badge>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </ng-template>
+    <ng-template #actionsTemplate>
+      <ion-list>
+        <ion-item button detail="true" [disabled]="order.depotToTransporterConfirmed || !order.depotToTransporter">
+          <ion-icon name="checkmark-done-outline" slot="start"></ion-icon>
+          <ion-label class="ion-text-wrap" [routerLink]="['/dispatch-from-depot-confirmation', order.orderId]">
+            <h2>Filled Cylinders</h2>
+            <p>Confirm receipt of filled cylinders from depot</p>
+          </ion-label>
+        </ion-item>
 
-    <ion-item-sliding #depotToTransporterIonItemSliding [disabled]="order.depotToTransporterConfirmed || !order.depotToTransporter">
-      <ion-item>
-        <ion-label class="ion-text-wrap">
-          <h2>Refilled cylinders from Depot</h2>
-          <p *ngIf="!order.depotToTransporter">
-            Cylinders not yet dispatched
-            <ion-icon size="small" name="alert-circle-outline" color="danger"></ion-icon>
-          </p>
-          <p *ngIf="!order.depotToTransporterConfirmed && order.depotToTransporter">
-            Cylinders not yet confirmed
-            <ion-icon size="small" name="alert-circle-outline" color="danger"></ion-icon>
-          </p>
-          <p *ngIf="!order.transporterToDealerConfirmed && order.depotToTransporterConfirmed">
-            Cylinders not yet delivered
-            <ion-icon size="small" name="alert-circle-outline" color="danger"></ion-icon>
-          </p>
-          <ion-badge style="margin-right: 10px" *ngIf="order.depotToTransporter" color="success">
-            Dispatched
-          </ion-badge>
-          <ion-badge style="margin-right: 10px" *ngIf="order.depotToTransporterConfirmed" color="success">
-            Confirmed
-          </ion-badge>
-          <ion-badge style="margin-right: 10px" *ngIf="order.transporterToDealerConfirmed" color="success">
-            Delivered
-          </ion-badge>
-          <ion-row *ngIf="!depotToTransporterIonItemSliding.disabled" class="ion-justify-content-between ion-align-items-center ion-no-margin ion-no-padding font-size-12">
-            <ion-col size="2"></ion-col>
-            <ion-col size="6" class="ion-no-margin ion-no-padding">Swipe to confirm</ion-col>
-            <ion-col size="2">
-              <ion-icon name="play-back-outline"></ion-icon>
-            </ion-col>
-          </ion-row>
-        </ion-label>
-      </ion-item>
-      <ion-item-options side="end">
-        <ion-item-option (click)="depotToTransporterIonItemSliding.close()" [routerLink]="['/dispatch-from-depot-confirmation', order.orderId]"><span
-          style="padding-left: 32px; padding-right: 32px">Confirm</span></ion-item-option>
-      </ion-item-options>
-    </ion-item-sliding>
+        <ion-item button detail="true" [disabled]="order.dealerToTransporterConfirmed || !order.dealerToTransporter">
+          <ion-icon name="checkmark-done-outline" slot="start"></ion-icon>
+          <ion-label class="ion-text-wrap" [routerLink]="['/dispatch-from-dealer-confirmation', order.orderId]">
+            <h2>Empty Cylinders</h2>
+            <p>Confirm receipt of empty cylinders from dealer</p>
+          </ion-label>
+        </ion-item>
 
-    <ion-item-sliding #dealerToTransporterIonItemSliding [disabled]="order.dealerToTransporterConfirmed || !order.dealerToTransporter">
-      <ion-item>
-        <ion-label class="ion-text-wrap">
-          <h2>Empty cylinders from dealer</h2>
-          <p *ngIf="!order.dealerToTransporter">
-            Cylinders not yet dispatched
-            <ion-icon size="small" name="alert-circle-outline" color="danger"></ion-icon>
-          </p>
-          <p *ngIf="!order.dealerToTransporterConfirmed && order.dealerToTransporter">
-            Cylinders not yet confirmed
-            <ion-icon size="small" name="alert-circle-outline" color="danger"></ion-icon>
-          </p>
-          <p *ngIf="!order.transporterToDepotConfirmed && order.dealerToTransporterConfirmed">
-            Cylinders not yet delivered
-            <ion-icon size="small" name="alert-circle-outline" color="danger"></ion-icon>
-          </p>
-          <ion-badge style="margin-right: 10px" *ngIf="order.dealerToTransporter" color="success">
-            Dispatched
-          </ion-badge>
-          <ion-badge style="margin-right: 10px" *ngIf="order.dealerToTransporterConfirmed" color="success">
-            Confirmed
-          </ion-badge>
-          <ion-badge style="margin-right: 10px" *ngIf="order.transporterToDepotConfirmed" color="success">
-            Delivered
-          </ion-badge>
-        </ion-label>
-      </ion-item>
-      <ion-item-options side="end">
-        <ion-item-option (click)="dealerToTransporterIonItemSliding.close()" [routerLink]="['/dispatch-from-depot', order.orderId]"><span
-          style="padding-left: 32px; padding-right: 32px">Collect</span></ion-item-option>
-      </ion-item-options>
-      <ion-row *ngIf="!dealerToTransporterIonItemSliding.disabled" class="ion-justify-content-between ion-align-items-center ion-no-margin ion-no-padding font-size-12">
-        <ion-col size="2"></ion-col>
-        <ion-col size="6" class="ion-no-margin ion-no-padding">Swipe to collect</ion-col>
-        <ion-col size="2">
-          <ion-icon name="play-back-outline"></ion-icon>
-        </ion-col>
-      </ion-row>
-    </ion-item-sliding>
+        <ion-item>
+          <ion-label class="ion-text-wrap">
+            <p *ngIf="!order.depotToTransporter">
+              *Awaiting dispatch from depot
+              <ion-icon color="danger" name="close-circle-outline"></ion-icon>
+            </p>
+            <p *ngIf="!order.dealerToTransporter">
+              *Awaiting dispatch from dealer
+              <ion-icon color="danger" name="close-circle-outline"></ion-icon>
+            </p>
+            <p *ngIf="order.depotToTransporterConfirmed">
+              *Filled cylinders received
+              <ion-icon color="success" name="checkmark-circle-outline"></ion-icon>
+            </p>
+            <p *ngIf="order.dealerToTransporterConfirmed">
+              *Empty cylinders received
+              <ion-icon color="success" name="checkmark-circle-outline"></ion-icon>
+            </p>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </ng-template>
   </ng-container>
 
 </ion-content>

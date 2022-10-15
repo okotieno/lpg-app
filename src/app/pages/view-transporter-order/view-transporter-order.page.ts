@@ -56,46 +56,23 @@ export class ViewTransporterOrderPage implements ViewWillEnter, OnInit {
 
 
   ionViewWillEnter() {
-    this.getOrder();
-  }
-
-  getOrder() {
-    this.orderId$.pipe(
-      switchMap((orderId) => this.ordersService.getItemWithId(+orderId)),
-      tap(({data}) => this.order$.next(data)),
+    this.getOrder().pipe(
       take(1)
     ).subscribe();
   }
 
-  async acceptOrder(slidingItemOrderStatus: IonItemSliding) {
-    const actionSheet = await this.actionSheetController.create({
-      header: 'Accept Order',
-      cssClass: 'ion-danger',
-      buttons: [{
-        text: 'Please confirm',
-        icon: 'checkmark-circle',
-        id: 'accept-button',
-        data: {
-          type: 'accept'
-        },
-      }, {
-        text: 'Cancel',
-        icon: 'close',
-        role: 'cancel',
-      }]
-    });
-    await actionSheet.present();
+  getOrder() {
+    return this.orderId$.pipe(
+      switchMap((orderId) => this.ordersService.getItemWithId(+orderId)),
+      tap(({data}) => this.order$.next(data))
+    );
+  }
 
-    const {data} = await actionSheet.onDidDismiss();
-    if (data) {
-      this.orderId$.pipe(
-        switchMap(orderId => this.ordersService.acceptOrder({orderId: +orderId})),
-        take(1),
-        tap(({data: res}) => {
-          this.order$.next(res);
-          slidingItemOrderStatus.close();
-        })
-      ).subscribe();
-    }
+  doRefresh($event: any) {
+    // this.orders$.next([]);
+    this.getOrder().pipe(
+      take(1),
+      tap(() => $event.target.complete())
+    ).subscribe();
   }
 }
