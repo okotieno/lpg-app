@@ -70,7 +70,7 @@
       </ion-item-options>
     </ion-item-sliding>
 
-    <ion-item-sliding #confirmDispatchIonItemSliding1 [disabled]="!order.transporterToDepot">
+    <ion-item-sliding #confirmDispatchIonItemSliding1 [disabled]="!order.isAssigned || order.dealerToTransporter">
       <ion-item>
         <ion-label>
           <h2>Empty cylinders</h2>

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { NotificationsService } from '../../services/notifications-service/notifications.service';
 import { IonItemSliding } from '@ionic/angular/directives/proxies';
-import { Router } from "@angular/router";
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-notifications',
@@ -34,7 +34,7 @@ export class NotificationsPage implements OnInit {
 
   visitNotificationItem(routerLink: string[], i: number) {
     this.notificationsService.markNotificationAsRead(i);
-    console.log({routerLink})
+    console.log({routerLink});
     this.router.navigate(routerLink).then();
   }
 }

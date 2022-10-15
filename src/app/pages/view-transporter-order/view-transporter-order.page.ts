@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { map, switchMap, take, tap } from 'rxjs/operators';
 import { OrderService } from '../../services/order-service/order.service';
@@ -6,13 +6,14 @@ import { BehaviorSubject } from 'rxjs';
 import { IOrder } from '../../interfaces/i-order';
 import { ActionSheetController, ViewWillEnter } from '@ionic/angular';
 import { IonItemSliding } from '@ionic/angular/directives/proxies';
+import { PusherService } from '../../services/pusher-service/pusher.service';
 
 @Component({
   selector: 'app-view-transporter-order',
   templateUrl: './view-transporter-order.page.html',
   styleUrls: ['./view-transporter-order.page.scss'],
 })
-export class ViewTransporterOrderPage implements ViewWillEnter {
+export class ViewTransporterOrderPage implements ViewWillEnter, OnInit {
 
   orderId$ = this.route.paramMap.pipe(
     map((params) => params.get('orderId'))
@@ -37,8 +38,19 @@ export class ViewTransporterOrderPage implements ViewWillEnter {
   constructor(
     private route: ActivatedRoute,
     private ordersService: OrderService,
-    private actionSheetController: ActionSheetController
+    private actionSheetController: ActionSheetController,
+    private pusherService: PusherService
   ) {
+  }
+
+  ngOnInit() {
+    this.orderId$.pipe(
+      tap((orderId) => {
+        this.pusherService.pusher.subscribe(`order.${orderId}`).bind('order.updated', (order: IOrder) => {
+          this.order$.next({...this.order$.value, ...order});
+        });
+      })
+    ).subscribe();
   }
 
 
