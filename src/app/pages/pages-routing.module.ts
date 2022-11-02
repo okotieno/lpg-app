@@ -5,6 +5,7 @@ import { PagesPage } from './pages.page';
 import { DealerGuard } from '../guards/dealer-guard/dealer.guard';
 import { DepotGuard } from '../guards/depot-guard/depot.guard';
 import { TransporterGuard } from '../guards/transporter-guard/transporter.guard';
+import { DealerOrDepotGuard } from '../guards/dealer-or-depot-guard/dealer-or-depot.guard';
 
 const routes: Routes = [
   {
@@ -19,7 +20,7 @@ const routes: Routes = [
   {
     path: 'make-order',
     loadChildren: () => import('./make-order-page/make-order-page.module').then(m => m.MakeOrderPagePageModule),
-    canLoad: [DealerGuard]
+    canLoad: [DealerOrDepotGuard]
   },
   {
     path: 'placed-orders',

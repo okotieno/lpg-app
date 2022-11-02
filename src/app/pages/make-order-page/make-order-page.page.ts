@@ -6,6 +6,7 @@ import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@ang
 import { AuthenticationService } from '../../services/authentication-service/authentication.service';
 import { map, tap } from 'rxjs/operators';
 import { DepotService } from '../../services/depot-service/depot.service';
+import { DealerService } from '../../services/dealer-service/dealer.service';
 import { formMixin } from '../../mixins/form.mixin';
 import { Router } from '@angular/router';
 import { OrderService } from '../../services/order-service/order.service';
@@ -49,10 +50,34 @@ export class MakeOrderPagePage extends formMixin() implements OnInit {
     })
   );
 
+  dealerIds$ = this.authenticationService.authDealerIds.pipe(
+    tap(dealers => {
+      if (dealers.length === 1) {
+        this.form.get('toDealerId').setValue(dealers[0]);
+      }
+    })
+  );
+  depotIds$ = this.authenticationService.authDepotIds.pipe(
+    tap(depots => {
+      if (depots.length === 1) {
+        this.form.get('fromDepotId').setValue(depots[0]);
+      }
+    })
+  );
+
+  dealerFilterOptions$ = this.dealerIds$.pipe(
+    map((dealerIds) => ({ids: dealerIds}))
+  );
+
+  depotFilterOptions$ = this.depotIds$.pipe(
+    map((depotIds) => ({ids: depotIds}))
+  );
+
   orderQuantities$ = new BehaviorSubject<any[]>([]);
 
   constructor(
     public depotService: DepotService,
+    public dealerService: DealerService,
     private fb: FormBuilder,
     private authenticationService: AuthenticationService,
     private router: Router,

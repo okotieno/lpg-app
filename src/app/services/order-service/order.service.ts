@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpContext } from '@angular/common/http';
 import { IResponse } from '../../interfaces/i-response';
 import { IOrder } from '../../interfaces/i-order';
-import { SHOW_HTTP_LOADER } from "../../helpers/constants";
+import { SHOW_HTTP_LOADER } from '../../helpers/constants';
 
 @Injectable({
   providedIn: 'root'
@@ -73,7 +73,7 @@ export class OrderService {
     );
   }
 
-  confirmCanisterDispatch({ orderId, ...params}: { orderId: number; }) {
+  confirmCanisterDispatch({ orderId, ...params}: { orderId: number }) {
     console.log({params});
     return this.http.post<IResponse<IOrder>>(`${this.url}/${orderId}/status`, {
       ...params,

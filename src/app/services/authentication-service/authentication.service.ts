@@ -38,6 +38,11 @@ export class AuthenticationService {
     map(user => user?.stationSpecificRoles.filter(({depotId}) => !!depotId).map(({depotId}) => depotId))
   );
 
+  isDealerOrDepot$ = this.auth$.pipe(
+    map(user => user?.stationSpecificRoles.filter(({depotId, dealerId}) => !!depotId || !!dealerId)),
+    map(roles => roles.length > 0)
+  );
+
   authTransporterIds = this.auth$.pipe(
     map(user => user?.stationSpecificRoles.filter(({transporterId}) => !!transporterId).map(({transporterId}) => transporterId))
   );

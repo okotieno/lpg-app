@@ -34,6 +34,14 @@
         </ion-label>
         <ion-icon name="chevron-forward-outline" slot="end"></ion-icon>
       </ion-item>
+      <ion-item *ngIf="isDepotUser$ | async" [routerLink]="['/make-order']">
+        <ion-icon name="bag-add-outline" slot="start"></ion-icon>
+        <ion-label>
+          <h2>Make Order</h2>
+          <p>Make a new order</p>
+        </ion-label>
+        <ion-icon name="chevron-forward-outline" slot="end"></ion-icon>
+      </ion-item>
       <ion-item *ngIf="isDealerUser$ | async" [routerLink]="['/placed-orders']">
         <ion-icon name="timer-outline" slot="start"></ion-icon>
         <ion-label>

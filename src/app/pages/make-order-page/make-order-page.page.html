@@ -8,8 +8,10 @@
 </ion-header>
 
 <ion-content>
+  <pre>{{ form.value | json }}</pre>
   <form [formGroup]="form" (ngSubmit)="submitOrder()">
     <ion-item-divider></ion-item-divider>
+
     <app-searchable-select
       label="From Depot"
       formControlName="fromDepotId"
@@ -17,14 +19,32 @@
       labelKey="depotName"
       [service]="depotService"
       slot="start"
+      [filterOptions]="depotFilterOptions$ | async"
     ></app-searchable-select>
-    <ion-item>
-      <ion-label position="floating">To Dealer</ion-label>
-      <ion-select formControlName="toDealerId">
-        <ion-select-option *ngFor="let dealer of dealerStations$ | async"
-                           [value]="dealer.dealerId">{{ dealer.dealerName }}</ion-select-option>
-      </ion-select>
-    </ion-item>
+    <app-searchable-select
+      label="To Dealer"
+      formControlName="toDealerId"
+      idKey="dealerId"
+      labelKey="dealerName"
+      [service]="dealerService"
+      slot="start"
+      [filterOptions]="dealerFilterOptions$ | async"
+    ></app-searchable-select>
+<!--    <app-searchable-select-->
+<!--      label="From Depot"-->
+<!--      formControlName="fromDepotId"-->
+<!--      idKey="depotId"-->
+<!--      labelKey="depotName"-->
+<!--      [service]="depotService"-->
+<!--      slot="start"-->
+<!--    ></app-searchable-select>-->
+<!--    <ion-item>-->
+<!--      <ion-label position="floating">To Dealer</ion-label>-->
+<!--      <ion-select formControlName="toDealerId">-->
+<!--        <ion-select-option *ngFor="let dealer of dealerStations$ | async"-->
+<!--                           [value]="dealer.dealerId">{{ dealer.dealerName }}</ion-select-option>-->
+<!--      </ion-select>-->
+<!--    </ion-item>-->
     <ion-item-divider></ion-item-divider>
 
     <ion-list formArrayName="orderQuantities">

@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   EventEmitter,
   Input,
@@ -19,6 +20,7 @@ import { AbstractControl, ControlValueAccessor, NgControl } from '@angular/forms
   selector: 'app-searchable-select',
   templateUrl: './searchable-select.component.html',
   styleUrls: ['./searchable-select.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SearchableSelectComponent
   implements ControlValueAccessor, OnInit, OnDestroy, OnChanges {
@@ -77,6 +79,7 @@ export class SearchableSelectComponent
   }
 
   writeValue(value: number | number[]): void {
+    console.log({value});
     if (value && !this.multiple && !Array.isArray(value)) {
       this.selectedValue = {key: value, label: value};
       this.service
