@@ -2,7 +2,6 @@ import { Component, ViewChild } from '@angular/core';
 import { AuthenticationService } from './services/authentication-service/authentication.service';
 import { switchMap, take, tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
-import { from } from 'rxjs';
 import { IonMenu } from '@ionic/angular';
 
 @Component({

@@ -1,4 +1,4 @@
-import { HttpContext, HttpContextToken } from '@angular/common/http';
+import { HttpContextToken } from '@angular/common/http';
 
 export const TOKEN_KEY = 'token-info';
 export const USER_KEY = 'user-info';

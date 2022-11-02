@@ -6,4 +6,8 @@ export const environment = {
     clientSecret: 'duK0bplTPn2BeyrsjX1939Y9OPIjPytEFUUNwjqD',
     clientId: '2'
   },
+  pusher: {
+    key: '46892a32aecb3743767b',
+    cluster: 'us2',
+  }
 };
