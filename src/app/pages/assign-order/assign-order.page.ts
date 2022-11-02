@@ -7,6 +7,7 @@ import { IOrder } from '../../interfaces/i-order';
 import { FormBuilder, Validators } from '@angular/forms';
 import { TransporterService } from '../../services/transporter-service/transporter.service';
 import { formMixin } from '../../mixins/form.mixin';
+import { AuthenticationService } from '../../services/authentication-service/authentication.service';
 
 @Component({
   selector: 'app-assign-order',
@@ -14,6 +15,7 @@ import { formMixin } from '../../mixins/form.mixin';
   styleUrls: ['./assign-order.page.scss'],
 })
 export class AssignOrderPage extends formMixin() implements OnInit {
+  authDepotIds$ = this.authService.authDepotIds;
   orderId$ = this.route.paramMap.pipe(
     map((params) => params.get('orderId'))
   );
@@ -35,7 +37,8 @@ export class AssignOrderPage extends formMixin() implements OnInit {
     private ordersService: OrderService,
     private fb: FormBuilder,
     public transporterService: TransporterService,
-    private router: Router
+    private router: Router,
+    private authService: AuthenticationService
   ) {
     super();
   }

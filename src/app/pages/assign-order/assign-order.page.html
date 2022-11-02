@@ -17,14 +17,17 @@
     </ion-item>
 
     <form [formGroup]="form" (ngSubmit)="submitOrderAssign()">
-      <app-searchable-select
-        label="Transporter"
-        formControlName="transporterId"
-        idKey="transporterId"
-        labelKey="transporterName"
-        [service]="transporterService"
-        slot="start"
-      ></app-searchable-select>
+      <ng-container *ngIf="authDepotIds$ | async as authDepotIds">
+        <app-searchable-select
+          label="Transporter"
+          formControlName="transporterId"
+          idKey="transporterId"
+          labelKey="transporterName"
+          [service]="transporterService"
+          [filterOptions]="{ 'depotIds[]': [authDepotIds, 1, 3]}"
+          slot="start"
+        ></app-searchable-select>
+      </ng-container>
       <ion-row>
         <ion-col>
           <ion-button *ngIf="(submitting$ | async) === false" [disabled]="form.invalid"
