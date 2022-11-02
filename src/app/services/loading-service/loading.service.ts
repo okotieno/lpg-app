@@ -18,7 +18,6 @@ export class LoadingService {
 
   startLoader() {
     if(this.loader) {
-      console.log('Exists');
       return this.loader.pipe(
         switchMap(loader => from(loader.present())),
       );

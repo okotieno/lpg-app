@@ -1,9 +1,8 @@
-<!--{{ filters$ | async | json }}-->
 <ion-item>
   <ion-label position="stacked">{{ label }}</ion-label>
   <ionic-selectable
     [searchDebounce]="500"
-    [ngModel]="item"
+    [(ngModel)]="selectedValue"
     (ngModelChange)="changeItem($event)"
     [ngModelOptions]="{standalone: true}"
     itemValueField="key"
@@ -14,6 +13,8 @@
     [placeholder]="placeholder"
   >
   </ionic-selectable>
-  <ion-button *ngIf="showDelete" (click)="removeItem.emit()" color="danger" fill="outline" slot="end"><ion-icon name="trash" ></ion-icon></ion-button>
+  <ion-button *ngIf="showDelete" (click)="removeItem.emit()" color="danger" fill="outline" slot="end">
+    <ion-icon name="trash"></ion-icon>
+  </ion-button>
 </ion-item>
 

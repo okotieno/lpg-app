@@ -35,15 +35,13 @@ export class SearchableSelectComponent
   @Input() filterOptions: Record<string, unknown> = {};
   isDisabled = false;
 
-  filterSearch = '';
   filterSearchChanged$ = new Subject<string>();
 
   selectedValue: any = null; // number| number[] | null
   selectedValuesBeforeSearch: any = null;
   filters$ = new BehaviorSubject<{ key: string | number; label: string }[]>([]);
   destroyed$ = new Subject();
-  item: any;
-  private queryParams: any = {page: 1, perPage: 15, searchTerm: ''};
+  private queryParams: any = {page: 1, perPage: 10, searchTerm: ''};
 
   constructor(
     @Self() @Optional() private control: NgControl
@@ -79,14 +77,13 @@ export class SearchableSelectComponent
   }
 
   writeValue(value: number | number[]): void {
-    console.log({value});
     if (value && !this.multiple && !Array.isArray(value)) {
-      this.selectedValue = {key: value, label: value};
+      this.selectedValue = {key: value, label: ''};
       this.service
         .getItemWithId(value)
         .pipe(
           map(({data}) => data),
-          tap(({[this.idKey]: key, [this.labelKey]: label}: any) => {
+          tap(({[this.idKey]: key, [this.labelKey]: label, ...params}: any) => {
             if (key) {
               this.selectedValue = {key, label};
               this.filters$.next([{key, label}]);
@@ -103,7 +100,7 @@ export class SearchableSelectComponent
       value.length > 0
     ) {
       this.service
-        .getItems({pageSize: 100, currentPage: 1, ids: value})
+        .getItems({perPage: 10, currentPage: 1, ids: value})
         .pipe(
           tap((responseObject: any) => {
             const items =
