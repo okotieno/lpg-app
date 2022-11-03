@@ -28,7 +28,7 @@
       <ion-list *ngIf="v.dispatchCylinders.length > 0">
         <ion-list-header>Dispatch Summary</ion-list-header>
         <ion-item *ngFor="let dispatchCylinder of v.dispatchCylinders">
-          <ion-label>{{ dispatchCylinder.size }}{{ dispatchCylinder.brand }}</ion-label>
+          <ion-label>[#{{ dispatchCylinder.code }}] {{ dispatchCylinder.size }}{{ dispatchCylinder.brand }}</ion-label>
         </ion-item>
       </ion-list>
 
