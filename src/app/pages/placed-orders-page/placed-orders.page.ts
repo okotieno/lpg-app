@@ -15,7 +15,7 @@ export class PlacedOrdersPage implements OnInit {
   orders$ = new BehaviorSubject<any[]>([]);
   queryParams = {
     page: 0,
-    perPage: 10,
+    perPage: 15,
     ['toDealerIds[]']: [],
     orderByDesc: true,
     orderBy: 'orderId'

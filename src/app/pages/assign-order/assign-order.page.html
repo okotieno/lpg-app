@@ -31,11 +31,11 @@
       <ion-row>
         <ion-col>
           <ion-button *ngIf="(submitting$ | async) === false" [disabled]="form.invalid"
-                      type="submit" color="success" expand="block">
+                      type="submit" color="primary" expand="block">
             Assign Order
             <ion-icon name="log-in"></ion-icon>
           </ion-button>
-          <ion-button *ngIf="(submitting$ | async)" color="success" expand="block">
+          <ion-button *ngIf="(submitting$ | async)" color="primary" expand="block">
             Assigning Order
             <ion-spinner name="lines"></ion-spinner>
           </ion-button>

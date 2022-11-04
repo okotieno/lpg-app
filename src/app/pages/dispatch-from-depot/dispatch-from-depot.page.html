@@ -45,11 +45,11 @@
         <ion-row>
           <ion-col>
             <ion-button *ngIf="(submitting$ | async) === false" [disabled]="form.invalid || v.totalQuantities !== v.dispatchCylinders.length"
-                        type="submit" color="success" expand="block">
+                        type="submit" color="primary" expand="block">
               Dispatch
               <ion-icon name="log-in"></ion-icon>
             </ion-button>
-            <ion-button *ngIf="(submitting$ | async)" color="success" expand="block">
+            <ion-button *ngIf="(submitting$ | async)" color="primary" expand="block">
               Dispatching
               <ion-spinner name="lines"></ion-spinner>
             </ion-button>
